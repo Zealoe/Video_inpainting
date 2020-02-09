@@ -36,7 +36,7 @@ These methods rely heavily on the hypothesis that the missing content in the cor
 %
 Recently, deep-learning-based methods achieve great performance improvement.
 A straightforward solution is to utilize 3D convolution layers to extract spatio-temporal features and predict missing content with smooth motion \cite{wang2019video}.
-To obtain temporally smooth results, optical flow is commonly used by aggregating contextual information from neighboring frames~\cite{Xu_2019_CVPR,Kim_2019_CVPR,Kim_2019_CVPR1}.
+To obtain temporally smooth results, optical flow is commonly used by aggregating contextual information from neighboring frames~\cite{Kim_2019_CVPR,Xu_2019_CVPR,Kim_2019_CVPR1}.
 For example, a deep optical flow completion network is proposed to propagate missing pixels across frames in DFVI ~\cite{Xu_2019_CVPR} . D. Kim~\emph{et al.} \cite{Kim_2019_CVPR,Kim_2019_CVPR1} leverage recurrent feedback to utilize potential information in previous frames.
 By introducing motion guidance, these methods pay more attention to temporal smoothness; however, structure rationality and object details have not been well explored. 
 %However, structural rationality is also a significant factor for realistic video inpainting. 
