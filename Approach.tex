@@ -4,17 +4,17 @@
 
 The target of our method is to recover the missing contents in a corrupted video with fine details and temporal consistency.
 %
-%Our intuition is that there exists complementary information in neighboring frames, which can benefit the inpainting process of each individual frame. Therefore, 
-In each data batch,  total $T$ frames $\boldsymbol{V}$ ($T=5$), indexed by $\msset{V}$, are fed to our inpainting network, as well as the corresponding masks $\boldsymbol{M}$ that indicate the missing regions. 
-The corresponding ground truth frames are denoted as $\boldsymbol{V}^{gt}$.
-The final output is the completed frame \(\widetilde{V}_t\) at time $t$. 
+We complete each frame by aggregating information for its neighboring frames. 
+%Our intuition is that there exists complementary information in neighboring frames, which can benefit the inpainting process of each individual frame. Therefore,
+In order to complete a frame $\widetilde{V}_t$ at time $t$, we take total $T$ frames $\boldsymbol{V}$ ($T=5$), indexed by $\msset{V}$, as input to our inpainting network in each data batch. 
+%as well as the corresponding masks $\boldsymbol{M}$ that indicate the missing regions. 
+%The corresponding ground truth frames are denoted as $\boldsymbol{V}^{gt}$.
+
 %Our method infers each target frame $Y_t$ individually but with hints from its neighboring source frames.
 %To fill up the missing region with structural details and temporal coherence,
- 
 As Fig.~\ref{fig:stiNet} shows, our framework consists of three main components. 
-The first part is an edge inpainting network (ENet) that targets to recover the missing edges, and the second part is a coarse-to-fine texture inpainting network (TexNet) that aims to complete the missing appearance details. 
-% that replenishes appearance details under the structure guidance.
-The third part leverages the ground truth motion flow as auxiliary constraints to preserve temporal coherence of both completed edge and texture during the training stage.
+The first part is an edge inpainting network (ENet) that targets to recover the missing edges, and the second part is a coarse-to-fine texture inpainting network (TexNet) that aims to complete the missing appearance details under the structure guidance.
+The third part leverages the ground truth motion flow as auxiliary constraints to preserve temporal coherence of both completed edge maps and textures during the training stage.
 %The ground truth motion flow is employed to guarantee the consistency of edges and aggregate previously synthesized frames to refine the current frame.
 %During the inference stage, only the edge-guided inpainting path is used to complete the target frame, which generates high-quality inpainted results with low time cost.
 
@@ -28,14 +28,17 @@ The third part leverages the ground truth motion flow as auxiliary constraints t
 
 \subsection{Edge Inpainting Network}
 \label{sec:edgenet}
-Before completing the missing texture in a piece of video, we first predict the sparse edges using an edge inpainting network (ENet).
-Compared with texture, the edge depicts the object shape and motion, which is much easier to imagine without complex colors.
-Therefore, under the guidance of well-completed object shape and motion, we can better inpaint the whole texture.
+%Before completing the missing texture in a piece of video, we first predict the sparse edges using an edge inpainting network (ENet).
+The edge inpainting network (ENet) complete the edges in the missing region to depict object shapes, which is much easier to hallucinate without complex colors.
+Therefore, under the guidance of well-completed object structure, we can better inpaint the whole texture.
  
 
-Let $\boldsymbol{V}^{gt}$ denote ground truth frames, and $\boldsymbol{V}_{g}^{gt}$ and  $\boldsymbol{E}^{gt}$ is corresponding grayscale version of frames and edge maps, respectively.
+%Let $\boldsymbol{V}^{gt}$ denote ground truth frames, and $\boldsymbol{V}_{g}^{gt}$ and  $\boldsymbol{E}^{gt}$ is corresponding grayscale version of frames and edge maps, respectively.
 %Thus, the corresponding initial corrupted edge maps $\boldsymbol{E}^{i}$ can be obtained by missing out the masked regions in $\boldsymbol{E}^{gt}$.
-%Given the input corrupted frames $\boldsymbol{X}$, a canny edge detector is first used to extract the edge maps $\boldsymbol{E}^{i}$. %Notably, the edges in the masked regions in $\boldsymbol{E}^{i}$ are missed. 
+
+Given the input corrupted frames $\boldsymbol{X}$ as well as the corresponding masks $\boldsymbol{M}$ where $M_p=1$ indicating corrupted pixels in  the missing regions. 
+%
+A canny edge detector is first used to extract the edge maps $\boldsymbol{E}^{i}$. %Notably, the edges in the masked regions in $\boldsymbol{E}^{i}$ are missed. 
 %Given the incompleted grayscale images $\boldsymbol{X}^{g}$ of input frame, a canny edge detector is first used to generate initial edge maps. 
 The input of ENet consists of the incomplete grayscale frames $\boldsymbol{V}^{g}=\boldsymbol{V}_{g}^{gt}\odot\big(1-\boldsymbol{M}\big)$, initial edge maps $\boldsymbol{E}^{i}=\boldsymbol{E}^{gt}\odot\big(1-\boldsymbol{M}\big)$, and their corresponding masks $\boldsymbol{M}$.
 %
@@ -43,7 +46,7 @@ As shown in Fig.~\ref{fig:stiNet}, ENet is denoted by $G^E$, which is composed o
 The 3D encoder and decoder are designed to learn the spatio-temporal correlation with the 3-dimensional convolution operations.
 The intermediate 2D residual blocks are used to enlarge the spatial receptive fields by using 2-dimensional convolution of large kernel size.
 Such a 3D+2D convolution architecture can achieve a good trade-off between spatial and temporal perception.
-the inpainted edge maps are obtained by:
+The inpainted $T$ edge maps are obtained by:
 \begin{equation}
 	\label{eq:edgenet}
 	\boldsymbol{\widetilde{E}}=G^E(\boldsymbol{E}^{i},\boldsymbol{V}^{g},\boldsymbol{M}).
