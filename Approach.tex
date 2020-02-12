@@ -6,7 +6,7 @@ The target of our method is to recover the missing contents in a corrupted video
 %
 We complete each frame by aggregating information for its neighboring frames. 
 %Our intuition is that there exists complementary information in neighboring frames, which can benefit the inpainting process of each individual frame. Therefore,
-In order to complete a frame $\widetilde{V}_t$ at time $t$, we take total $T$ frames $\boldsymbol{V}$ ($T=5$), indexed by $\msset{V}$, as input to our inpainting network in each data batch. 
+In order to complete a target frame $\widetilde{V}_t$ at time $t$, we take total $T$ frames $\boldsymbol{V}$ ($T=5$), indexed by $\msset{V}$, as input to our inpainting network in each data batch. 
 %as well as the corresponding masks $\boldsymbol{M}$ that indicate the missing regions. 
 %The corresponding ground truth frames are denoted as $\boldsymbol{V}^{gt}$.
 
@@ -18,33 +18,33 @@ The third part leverages the ground truth motion flow as auxiliary constraints t
 %The ground truth motion flow is employed to guarantee the consistency of edges and aggregate previously synthesized frames to refine the current frame.
 %During the inference stage, only the edge-guided inpainting path is used to complete the target frame, which generates high-quality inpainted results with low time cost.
 
-\begin{figure}[t]
-	\centering
-	\includegraphics[width=0.8\columnwidth]{coars-fine} % Reduce the figure size so that it is slightly narrower than the column. Don't use precise values for figure width.This setup will avoid overfull boxes. 
-	\caption{Given a corrupted frame (a), our ENet first completes sparse edges (b) which well represent the structure of the missing content. Then TexNet progressively replenishes textures under the guidance of synthesized edges from coarse (c) to fine (d).}
-	
-	\label{fig:coarse-fine}
-\end{figure}
 
 \subsection{Edge Inpainting Network}
 \label{sec:edgenet}
 %Before completing the missing texture in a piece of video, we first predict the sparse edges using an edge inpainting network (ENet).
 The edge inpainting network (ENet) complete the edges in the missing region to depict object shapes, which is much easier to hallucinate without complex colors.
 Therefore, under the guidance of well-completed object structure, we can better inpaint the whole texture.
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=0.8\columnwidth]{coars-fine} % Reduce the figure size so that it is slightly narrower than thre column. Don't use precise values for figure width.This setup will avoid overfull boxes. 
+	\caption{To inpaint missing regions in the target corrupted frame (a), our ENet first completes corresponding sparse edge (b), which well represents the structure of the missing contents. Then TexNet progressively replenishes textures under the guidance of synthesized edges from coarse (c) to fine (d).}
+	
+	\label{fig:coarse-fine}
+\end{figure}
  
 
 %Let $\boldsymbol{V}^{gt}$ denote ground truth frames, and $\boldsymbol{V}_{g}^{gt}$ and  $\boldsymbol{E}^{gt}$ is corresponding grayscale version of frames and edge maps, respectively.
 %Thus, the corresponding initial corrupted edge maps $\boldsymbol{E}^{i}$ can be obtained by missing out the masked regions in $\boldsymbol{E}^{gt}$.
 
-Given the input corrupted frames $\boldsymbol{X}$ as well as the corresponding masks $\boldsymbol{M}$ where $M_p=1$ indicating corrupted pixels in  the missing regions. 
+Given the input corrupted frames $\boldsymbol{V}$ as well as the corresponding binary masks $\boldsymbol{M}$, where $M_t^p=1$ indicating corrupted pixel on position $p$ in the missing regions at time $t$. 
 %
-A canny edge detector is first used to extract the edge maps $\boldsymbol{E}^{i}$. %Notably, the edges in the masked regions in $\boldsymbol{E}^{i}$ are missed. 
+A Canny edge detector is first used to extract the corresponding edge maps $\boldsymbol{E}^{i}$. %Notably, the edges in the masked regions in $\boldsymbol{E}^{i}$ are missed. 
 %Given the incompleted grayscale images $\boldsymbol{X}^{g}$ of input frame, a canny edge detector is first used to generate initial edge maps. 
-The input of ENet consists of the incomplete grayscale frames $\boldsymbol{V}^{g}=\boldsymbol{V}_{g}^{gt}\odot\big(1-\boldsymbol{M}\big)$, initial edge maps $\boldsymbol{E}^{i}=\boldsymbol{E}^{gt}\odot\big(1-\boldsymbol{M}\big)$, and their corresponding masks $\boldsymbol{M}$.
+The input of ENet consists of the incomplete grayscale version of frames $\boldsymbol{V}^{g}$, initial edge maps $\boldsymbol{E}^{i}=\boldsymbol{E}^{gt}\odot\big(1-\boldsymbol{M}\big)$, and their corresponding masks $\boldsymbol{M}$.
 %
 As shown in Fig.~\ref{fig:stiNet}, ENet is denoted by $G^E$, which is composed of a two-layer 3D encoder, eight 2D residual blocks, and a two-layer 3D decoder. 
 The 3D encoder and decoder are designed to learn the spatio-temporal correlation with the 3-dimensional convolution operations.
-The intermediate 2D residual blocks are used to enlarge the spatial receptive fields by using 2-dimensional convolution of large kernel size.
+The intermediate 2D residual blocks are used to enlarge the spatial receptive fields by using 2-dimensional convolutions of large kernel size.
 Such a 3D+2D convolution architecture can achieve a good trade-off between spatial and temporal perception.
 The inpainted $T$ edge maps are obtained by:
 \begin{equation}
@@ -77,11 +77,11 @@ $\mathcal{L}^E_{fm}$ evaluates the feature-level similarity between ground truth
 	\mathcal{L}^E_{fm}=\sum_{k=1}^L{\frac{1}{N_k}\left\| D^E_k(\boldsymbol{E}^{gt},\boldsymbol{V}^{g})- D^E_k(\boldsymbol{\widetilde{E}},\boldsymbol{V}^{g})\right\|_1},
 \end{equation}
 where $D^E_k$ is the output of the $k$-th layer in $L$-layer $D^E$, while $N_k$ is the element number of $D^E_k$.
-By considering both feature-level and image-level similarities in Eq.~\eqref{eq:loss_e_}, the edge generator $G^E$ can be well-trained to produce plausible and structurally rational edge maps.
+By considering both feature-level and image-level similarities in Eq.~\eqref{eq:loss_e_}, the edge generator $G^E$ can be trained to produce plausible and structurally rational edge maps.
 %Note that the discriminator $D^E$ is not optimized by the feature matching loss term. It plays as a feature extractor to optimize the generator $G^E$ for producing plausible edge maps $\boldsymbol{E}$.
 
 Consequently, the 3D+2D architecture and two-level loss function enable the ENet to inpaint the missing structural edges accurately.
-An example of the generated edges is given in Fig.~\ref{fig:coarse-fine} (a) and (b).
+An example of the generated edge map is given in Fig.~\ref{fig:coarse-fine} (a) and (b).
 
 
 
@@ -105,7 +105,7 @@ An example of the generated edges is given in Fig.~\ref{fig:coarse-fine} (a) and
 With the completed edge maps $\boldsymbol{\widetilde{E}}$ for the $T$ frames $\boldsymbol{V}$, we then fill the image texture using a coarse-to-fine network,~\emph{i.e.,} TexNet.
 %
 Notably, the object structure,~\emph{e.g.,} object shapes, has been captured in the completed edge frames $\boldsymbol{\widetilde{E}}$.
-Thus, it becomes much easier to fill the missing texture with the structure guidance of $\boldsymbol{\widetilde{E}}$.
+Thus, it becomes much easier to fill the missing texture with the structural guidance of $\boldsymbol{\widetilde{E}}$.
 
 To synthesize realistic frame texture, the proposed TexNet adopts a coarse-to-fine architecture, as shown in Fig.~\ref{fig:stiNet}.
 Specifically, TexNet consists of a coarse inpainting network and a refinement network.
@@ -114,19 +114,20 @@ Specifically, TexNet consists of a coarse inpainting network and a refinement ne
 First, the coarse inpainting network consists of a set of 3D convolutions to capture the spatio-temporal information, which targets to produce a rough completion $\boldsymbol{\widetilde{V}}^i$ for the $T$ frames with colors and textures.
 %The 3D coarse network incorporates neighboring frames by convolutions of the time dimension.
 Then, the refinement network takes the rough inpainting results $\boldsymbol{\widetilde{V}}^i$ and the synthesized edge maps $\boldsymbol{\widetilde{E}}$ as inputs to further refine the coarse details in $\boldsymbol{\widetilde{V}}^i$ with the guidance of structural edges $\boldsymbol{\widetilde{E}}$.
-Notably, only 2D convolution is used in refinement network to improve the inference efficiency. 
+Notably, only 2D convolutional layers are used in the refinement network to improve the inference efficiency. 
 %For the corrupted region, our ENet first completes sparse edges which well represent the structure of the missing content, then TexNet progressively replenishes textures under the guidance of synthesized edges.
 
-Besides taking $\boldsymbol{\widetilde{E}}$ as an auxiliary input in refinement network, we further design a structure attention module (SAM) to fully encode the structural information.
+Besides taking $\boldsymbol{\widetilde{E}}$ as an auxiliary input in the refinement network, we further design a structure attention module (SAM) to fully encode the structural information.
 The detailed implementation of SAM is given in Fig.~\ref{SEM}, which is used as an intermediate layer in the refinement network in Fig.~\ref{fig:stiNet}.
-The inputs of SAM are the intermediate video features from $\boldsymbol{\widetilde{V}}^i$ and embedded edge features from $\boldsymbol{\widetilde{E}}$, and the output is a matrix that indicates the relationship among different spatial features.
+The inputs of SAM are the intermediate video features extracted from $\boldsymbol{\widetilde{V}}^i$ and $\boldsymbol{\widetilde{E}}$ via 2D convolutional layers, as well as
+the edge maps. %The output is a matrix that indicates the relationship among different spatial features.
 %Two separate convolution blocks are first applied to embed structure features from the predicted edge maps $\boldsymbol{E}$.
 % which alleviate the feature discrepancy between structural edge and video texture.
 First, the intermediate video features and embedded edge features are interacted to calculate the latent structure-texture correlation via matrix multiplication. 
-After a SoftMax operation, the normalized attention map is obtained, which represents correlation between the structure and high-level video features.
+After a SoftMax operation, the normalized attention map is obtained, which represents the correlation between the structure and high-level video features.
 %
 Then, the normalized attention map is applied to the intermediate video features, and the structure information is thus embedded in TexNet, which can better extract useful structural information brought by edges.
-After introducing structural guidance, the inpainted content by TexNet becomes more realistic, as Fig.~\ref{fig:coarse-fine} shows.
+After introducing structural guidance, the inpainted content by TexNet becomes more realistic, as Fig.~\ref{fig:coarse-fine} (d) shows.
 
 %The core insight of SAM is to explicitly capture the spatial correlation between edges and textures, which is regarded as a guidance in the texture generation processing.
 
@@ -172,7 +173,7 @@ From the results in Fig.~\ref{fig:coarse-fine} (c) and (d), it can be seen that 
 
 
 \begin{table*}[t]
-	\caption{Comparisons with four state-of-the-art methods proposed in 2019 on YouTubeVOS. Our method outperform all other methods on three metrics, with fast inference speed.}\smallskip
+	\caption{Comparisons with four state-of-the-art methods proposed in 2019 on YouTubeVOS. Our method outperforms all other methods on three metrics, with fast inference speed.}\smallskip
 	
 	\centering
 	\resizebox{2.0\columnwidth}{!}{
@@ -289,7 +290,7 @@ From the results in Fig.~\ref{fig:coarse-fine} (c) and (d), it can be seen that 
 
 \subsection{Flow-Guided Temporal Coherence Enhancement}
 \label{sec:fec}
-Besides the structure guidance, the motion information is also considered to maintain temporal consistency among frames.
+Besides the structural guidance, the motion information is also considered to maintain temporal consistency among frames.
 %It is vital to maintain temporal consistency in video inpainting.
 %Optical flows are widely used to represent the dense correspondence between frames.
 %To enhance temporal consistency in the synthesized results
@@ -299,7 +300,7 @@ To this end, the optical flow is employed in the training stage of both ENet and
 %Moreover, we design an ensemble module that leverages the previous inpainted frames to refine the current frame completion, as Fig.~\ref{fig:stiNet} shows. 
 %
 
-During training, a set of flow maps \(\boldsymbol{O}\) between the current frame $V_t$ and its neighboring frames are generated using a pre-trained flow extraction network, such as FlowNet2.0~\cite{Flownet_2017_CVPR}.
+During training, a set of flow maps \(\boldsymbol{O}\) between the current frame $V_t^{gt}$ and its neighboring frames are generated using a pre-trained flow extraction network, such as FlowNet2.0~\cite{Flownet_2017_CVPR}.
 Specifically, \(\boldsymbol{O}\) consists of four flow maps \((O_{t\Rightarrow t-7}, O_{t\Rightarrow t-3}, O_{t\Rightarrow t+3}, O_{t\Rightarrow t+7})\).
 \(\boldsymbol{O}\) contains the ground truth motion information between frames, which is important to both edge and texture generation.
 
@@ -312,16 +313,16 @@ Specifically, \(\boldsymbol{O}\) consists of four flow maps \((O_{t\Rightarrow t
 %The detailed architecture of FNet is shown in Fig.~\ref{fig:stiNet}.
 
 
-In terms of the ENet,~\emph{i.e.,} inpainting the missing edges, \(\boldsymbol{O}\) is used to first warp the neighboring edge maps to the current frame, and then compute the consistency between neighboring edge maps. 
+In terms of the ENet which completes the missing edges, \(\boldsymbol{O}\) is used to first warp the neighboring edge maps to the current frame, and then compute the consistency between neighboring edge maps. 
 %
 %Instead of separately training two subnetworks ENet and FNet, we train them jointly, because the temporal correlation and structural details can boost each other. 
 Thus, a flow-guided edge consistency loss is defined as:
 %
 \begin{equation}
 	\label{eq:flow_edge}
-	\mathcal{L}^E_{fec}=\sum_{k}\frac{1}{\left\|M_{t} \right\|_1}\left\|(\widetilde{E}_{t}-\phi(O_{t\Rightarrow t+k},\widetilde{E}_{t+k}))\odot M_{t}\right\|_1,
+	\mathcal{L}^E_{fec}=\sum_{k}\frac{1}{\left\|M_{t} \right\|_1}\left\|\big(\widetilde{E}_{t}-\phi(O_{t\Rightarrow t+k},E_{t+k}^{gt})\big)\odot M_{t}\right\|_1,
 \end{equation}
-where $\phi(O_{t\Rightarrow t+k},\widetilde{E}_{t+k})$ is the warping operation which warps the edge map $\widetilde{E}_{t+k}$ to the target frame according to the generated optical flow $O_{t\Rightarrow t+k}$.
+where $\phi(O_{t\Rightarrow t+k},E_{t+k}^{gt})$ is the warping operation which warps the edge map $E_{t+k}^{gt}$ to the target frame according to the generated optical flow $O_{t\Rightarrow t+k}$.
 $k$ denotes the index of neighboring frames ($k\in \left\{-7,-3,+3,+7 \right\}$). 
 With the flow-guided edge consistency loss $\mathcal{L}^E_{fec}$, the loss function of  Eq.~\eqref{eq:loss_e_} for ENet becomes:
 \begin{equation}
@@ -350,15 +351,15 @@ where $\mathcal{L}^F_{rec}$ and $\mathcal{L}^F_{har}$ are respectively $l_1$ los
 About the TexNet, we further enforce the temporal coherence of synthesized neighboring textures via a flow warping constraint $\mathcal{L}^T_{flo}$ by: 
 \begin{equation}
 	\label{eq:inp_flow}
-		\mathcal{L}^T_{flo}=\sum_{k}\frac{1}{\left\|M_{t} \right\|_1}\left\|(\widetilde{V}_{t}-\phi(O_{t\Rightarrow t+k},\widetilde{V}_{t+k}))\odot M_{t}\right\|_1,
+		\mathcal{L}^T_{flo}=\sum_{k}\frac{1}{\left\|M_{t} \right\|_1}\left\|\big(\widetilde{V}_{t}-\phi(O_{t\Rightarrow t+k},V_{t+k}^{gt})\big)\odot M_{t}\right\|_1,
 	\end{equation}
-	where  $k$ is still in $\{-7,-3, 3, 7\}$. $\phi(O_{t\Rightarrow t+k},\widetilde{V}_{t+k})$ warps $\widetilde{V}_{t+k}$ to $\widetilde{V}_{t}$ using flow $O_{t\Rightarrow t+k}$. Finally, $\mathcal{L}^T_{flo}$ is added to Eq.~\eqref{eq:1}, which becomes:
+	where  $k$ is still in $\{-7,-3, 3, 7\}$. $\phi(O_{t\Rightarrow t+k},V_{t+k}^{gt})$ warps $V_{t+k}^{gt}$ to the target frame using flow $O_{t\Rightarrow t+k}$. Finally, $\mathcal{L}^T_{flo}$ is added to Eq.~\eqref{eq:1}, which becomes:
 \begin{equation}
 \label{eq:1_}
 \min\limits_{G^T} \max \limits_{D^T} \big(\mathcal{L}^{T}_{rec}+\mathcal{L}^T_{adv} +\mathcal{L}^T_{flo}\big),
 \end{equation}
 
-After adding the motion information to both training process of ENet and TexNet, the temporal consistency can be preserved in both edge generation and texture inpainting.
+After adding the motion information to both the training process of ENet and TexNet, the temporal consistency can be preserved in both edge generation and texture inpainting.
 Since the motion is only used in the training stage, the inference of the proposed structure-guided inpainting method is efficient and effective.
 
 %Finally, a temporal ensemble module is designed to refine the current frame $Y_t$ by aggregating previous frames. %The architecture is shown in Fig.~\ref{fig:stiNet}. 

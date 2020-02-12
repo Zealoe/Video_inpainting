@@ -458,14 +458,14 @@
 % As a general rule, do not put math, special symbols or citations
 % in the abstract or keywords.
 \begin{abstract}
-The fundamental challenge in video inpainting is the difficulty of generating video contents with fine details, while keeping spatio-temporal coherence in the missing region. 
-Recent methods focus on synthesizing temporal smooth pixels by exploiting the flow information, while ignoring maintaining the semantic structure coherence between frames.
-This makes them suffer from over-smooting and blurry contours, which significantly aggravate the visual inpainting quality. 
+A fundamental challenge in video inpainting is the difficulty of generating video contents with fine details, while keeping spatio-temporal coherence in the missing region. 
+Recent studies focus on synthesizing temporal smooth pixels by exploiting the flow information, while ignoring maintaining the semantic structural coherence between frames.
+This makes them suffer from over-smoothing and blurry contours, which significantly reduces the visual quality of inpainting results. 
 To address this issue, we present a novel structure-guided video inpainting approach that introduces temporal structure coherence to improve video inpanting results. 
 In contrast to directly synthesizing the missing pixels, we first complete the edges in the missing regions to well represent scene structure and object shapes via an edge inpainting network with 3D convolutions. 
 Then, we replenish textures using a coarse-to-fine synthesis network with a structure attention module (SAM), under the guidance of the completed edge structure.
-Specifically, the SAM can model the semantic correlation between video textures and structural edges to generate structure-consistent inpainted video.
-Besides, the flow information is used as a temporal consistency constraint during both edge inpainting and texture inpainting learning.
+Specifically, the SAM can model the semantic correlation between video textures and structural edges to generate structure-consistent inpainted videos.
+Besides, the flow information is used as a temporal consistency constraint for self-supervision during training the edge inpainting and texture inpainting modules.
 %, which can: a) enforce temporal consistency between the synthesized adjacent edge maps and b) smoothen flickers in the inpainting results via temporal consistency constraints. 
 Consequently, the inpainting results using our approach are visually pleasing with fine details and temporal coherence in low computational cost. 
 Experiments on the YouTubeVOS and DAVIS datasets show that our method obtains state-of-the-art performance in different video inpainting settings.

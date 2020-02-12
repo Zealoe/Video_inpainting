@@ -9,10 +9,10 @@ To evaluate the effectiveness of our approach, we conduct a series of comparison
 \noindent \textbf{Mask Setting.} Considering different real-world applications, we test four kinds of mask settings in this paper, which are different in shapes and positions of the missing regions. 
 %The first and the second settings aims to recover rectangular regions, which are common in watermark removal.
 \begin{itemize}
-\item Fixed square mask: The size and position of the missing square region are fixed through the whole video. 
-\item Moving square mask: The position and size of the square mask change over frames. 
-\item Free-from mask: We apply irregular masks which imitate hand-drawn masks on each frame, following \cite{liu2018partialinpainting}. 
-\item Foreground object mask: This type of mask is defined to line out foreground objects in videos and used for testing object removal.
+\item (1) Fixed square mask: The size and position of the missing square region are fixed through the whole video. 
+\item (2) Moving square mask: The position and size of the square mask change over frames. 
+\item (3) Free-from mask: We apply irregular masks which imitate hand-drawn masks on each frame, following \cite{liu2018partialinpainting}. 
+\item (4) Foreground object mask: This type of mask is defined to line out foreground objects in videos and used for testing object removal.
 \end{itemize}
 
 \noindent\textbf{Dataset.} 
@@ -38,8 +38,8 @@ DAVIS dataset contains 90 video sequences that are annotated with foreground obj
 	The videos are complex with occlusions, fast motion, and various objects. }
 
 \noindent \textbf{Implementation details and Evaluation Metrics.} 
-All the models are test on a TITAN X (Pascal) GPU with frame size $256 \times 256$.
-For training data, We randomly sample a training clip every 40 frames from each video in the dataset. Our training consists of three steps. First, we train ENet with learning rate set as $1e-4$ for $G^E$ and $1e-5$ for $D^E$. 
+All the models are tested on a TITAN X (Pascal) GPU with frame size $256 \times 256$.
+For training data, we randomly sample a training clip every 40 frames from each video in the dataset. Our training consists of three steps. First, we train ENet with learning rate set as $1e-4$ for $G^E$ and $1e-5$ for $D^E$. 
 Then we train TexNet while fixing ENet. Learning rate is set as $1e-4$ for $G^T$, and $4e-4$ for $D^T$.
 We first train ENet and TexNet without corresponding flow losses, and then add the flow losses to refine the final results when flow assistance is utilized.
 %ensemble module is finally trained while fixing all the other modules. Learning rate is $1e-4$.
@@ -50,7 +50,7 @@ As for the hyper-parameters, $\lambda_1=10.0,\lambda_2=0.2$.
 
 Different data preparations and evaluation metrics are used according to mask settings. a) We randomly generate masks for training videos in terms of mask settings (1), (2), and (3). Masked videos are used for testing.
 Three commonly-used metrics, including structural similarity index (SSIM) \cite{wang2004image}, peak signal-to-noise ratio (PSNR), and Fr{\'e}chet Inception Distance (FID) \cite{heusel2017gans} are used to quantitatively evaluate the performance of our method. 
-b) For mask setting (4), we prepare masks of random shapes and motions to synthesize the foreground object masks in the training stage. The network is first trained on the YoutubeVOS dataset and then finetuned on DAVIS. Since there is no ground truth available for this setting, which means that we can not use quantitive evaluations to measure the output quality, we conduct a user study for video foreground object removal.  
+b) For the mask setting (4), we prepare masks of random shapes and motions to synthesize the foreground object masks in the training stage. The network is first trained on the YoutubeVOS dataset and then finetuned on DAVIS. Since there is no ground truth available for this setting, which means that we can not use quantitive evaluations to measure the output quality, we conduct a user study for video foreground object removal.  
 
 
 
@@ -72,25 +72,26 @@ We train \cite{nazeri2019edgeconnect,Xu_2019_CVPR} using their published codes a
 
 The quantitative results and inference speeds are reported in Table~\ref{tab:sem}.
 It shows that our method outperforms state-of-the-art methods on the three metrics, demonstrating the effectiveness of introducing structure guidance into video inpainting.
-Moreover, our method is also very efficient, e.g., four times faster than \cite{Kim_2019_CVPR1} and nine  times faster than \cite{Xu_2019_CVPR}. 
+Moreover, our method is also very efficient, e.g., four times faster than DVI \cite{Kim_2019_CVPR1} and nine times faster than DFVI \cite{Xu_2019_CVPR}. 
 %
-Models have different performances with different masks. The best performance is obtained when using moving square masks, which is because that the network can learn complementary information from neighboring frames.
+We also notice that all models have different performances with different masks. The best performance of an individual model is obtained when using moving square masks, which is because the network can learn complementary information from neighboring frames.
 Some inpainting examples are shown in Fig.~\ref{viszong}.
 Compared with existing methods, the inpainting results predicted by our method are more realistic with finer details. 
 We can observe that the frames completed using our method contain sharper object boundaries. This is achieved by the effectiveness of structure information in video inpainting.
 %
-When looking at two neighboring frames in each video, it can be seen that our method produces more temporally smooth results. 
+It can also be seen that our method produces temporally smooth results when observing neighboring frames. 
 
 
 
-The inference speed of Edge-Connect \cite{nazeri2019edgeconnect} is fast, the reason of which is that it does not consider axillary temporal  information between frames. 
-Comparing to this 2D image inpainting method, which also predicts edges to represent the structure, our method greatly increases the completion performance by leveraging neighboring frames to complete edges and synthesize textures. Thus, our method can generate more temporal coherent and realistic contents.
+Compared with 2D image inpainting method, Edge-Connect \cite{nazeri2019edgeconnect},
+which also predicts edges to represent the structure,
+our method greatly increases the completion performance by leveraging neighboring frames to complete edges and synthesize textures. Thus, our method can generate more temporal coherent and realistic contents. The inference speed of Edge-Connect is fast, the reason of which is that it does not consider axillary temporal information between frames. 
 
-Compared with the second-best video inpainting method DFVI \cite{Xu_2019_CVPR}, our method can produce frames with finer structural details. Besides, optical flow is only used in training period in our method, while DFVI requires iterative optimization with optical flow. Thus the inference speed of our method is much faster than that of DFVI.
+Compared with the second-best video inpainting method DFVI \cite{Xu_2019_CVPR}, our method can produce frames with finer structural details. Besides, only ENet and TexNet are used to directly predict final outputs in the testing period in our method, while DFVI requires iterative pixel propagation. Thus the inference speed of our method is much faster than that of DFVI.
 %
 
 %% Time performance analysis 
-It demonstrates that our method is not a naive extension to utilize structure information in video inpainting and also indicates that structure clues can bring strong promotion to video inpainting.
+Both the quantitative and qualitative results demonstrate that our method is not a naive extension to utilize structure information in video inpainting and also indicates that structural clues can bring strong promotion to video inpainting.
 
 
 
@@ -103,18 +104,12 @@ It demonstrates that our method is not a naive extension to utilize structure in
 
 
 
-\begin{figure}[t]
-	\centering
-	\includegraphics[width=0.85\columnwidth]{vis_forg} % Reduce the figure size so that it is slightly narrower than the column. Don't use precise values for figure width. This setup will avoid overfull boxes. 
-	\caption{Results of object foreground removal. The red masks in input frames indicate the objects to be removed. Our method produce results with plausible structures and details.}
-	\label{vis_forg}
-\end{figure}
 
 \subsection{Results on Object Removal}
 
 
 In regard to the foreground object mask setting that aims to remove undesired objects in videos, there is no ground truth for quantitative evaluation. Therefore,
-we conduct a user study on the DAVIS dataset to evaluate the visual quality of our method, compared with four methods \cite{nazeri2019edgeconnect,wang2019video,Kim_2019_CVPR1,Xu_2019_CVPR}.
+we conduct a user study on the DAVIS dataset to evaluate the visual quality of our method, compared with the four methods \cite{nazeri2019edgeconnect,wang2019video,Kim_2019_CVPR1,Xu_2019_CVPR}.
 %
 In each test, we show three videos to the subject at the same time. The original video with red masks indicating objects to remove is shown in the middle, while the inpainting results of our method and one of the other four methods are shown on the two sides in random order.
 %  
@@ -129,7 +124,7 @@ Therefore, each pair of methods is compared about 220 times.
 
 
 
-The preference in the user study is shown in Fig.~\ref{userstudy}. 
+The preference results in the user study are shown in Fig.~\ref{userstudy}. 
 Comparing to Edge-Connect \cite{nazeri2019edgeconnect}, CombCN \cite{wang2019video}, DVI \cite{Kim_2019_CVPR1}, our results are preferred by a significantly larger portion of subjects.
 %
 When comparing with the flow-guided method DFVI~\cite{Xu_2019_CVPR}, our method is preferred by $55.24\%$ of the tests. 
@@ -181,8 +176,6 @@ Notably, our method is much faster than DFVI.
 	\label{tab:abl}
 \end{table*}
 
-
-
 \begin{figure}[!t]
 	\centering
 	\includegraphics[width=1.0\columnwidth]{userstudy} % Reduce the figure size so that it is slightly narrower than the column. Don't use precise values for figure width.This setup will avoid overfull boxes. 
@@ -191,11 +184,18 @@ Notably, our method is much faster than DFVI.
 \end{figure}
 %
 
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=0.85\columnwidth]{vis_forg} % Reduce the figure size so that it is slightly narrower than the column. Don't use precise values for figure width. This setup will avoid overfull boxes. 
+	\caption{Results of object foreground removal. The red masks in input frames indicate the objects to be removed. Our method produces results with plausible structures and details.}
+	\label{vis_forg}
+\end{figure}
+
+
 Fig.~\ref{vis_forg} shows two examples of object removal using different methods. 
-We can see that inpainted results generated by our methods are visually better than existing methods.
-Compared to the blurry contents in the results of Edge-Connect, CombCN, and DVI, our method produces sharp object boundaries and fine visual details. Notably, other methods 
-Though the completed contents using DFVI have sharp edges, the global structure of the human bodies is corrupted. In comparison, our method achieves more intact and plausible structure with fine details.
-The results demonstrates the importance of utilizing structure information in video inpainting. 
+We can see that the inpainted results generated by our methods are visually better than existing methods.
+Compared to the blurry contents in the results of Edge-Connect, CombCN, and DVI, our method produces sharp object boundaries and fine visual details. Notably, though the completed contents using DFVI have sharp edges, the global structure of the human bodies is corrupted. In comparison, our method achieves more intact and plausible structure with fine details.
+The results demonstrate the importance of utilizing structure information in video inpainting. 
 
 
 
@@ -209,7 +209,7 @@ This model simply integrates neighboring frames to predict the missing content f
 %
 Then we add the edge inpainting network and fed the texture inpainting network with the completed edge maps to get the second model `+Edge'.
 The third model `+SAM' is constructed by adding the structure attention module on the second model. 
-Finally, we add the flow guidance to get our full model `Ours'. Especially, we only add the flow guidance on training stage, which means it brings no computation costs to test.
+Finally, we add the flow guidance to get our full model `Ours'. Especially, we only add the flow guidance in the training stage, which means it brings no computation costs to test.
 The quantitative results are reported as in Table~\ref{tab:abl}. 
 
 
@@ -225,16 +225,16 @@ The quantitative results are reported as in Table~\ref{tab:abl}.
 
 
 
-In Table~\ref{tab:abl}, `+Edge' brings a large improvement over the baseline model.
-It indicates that sparse edges can provide effective structural guidance in video inpainting.%, which helps the network predict accurate missing content.
+In Table~\ref{tab:abl}, `+Edge' brings large improvement over the baseline model.
+It indicates that sparse edges can provide effective structural guidance in video inpainting.
 When we further add SAM to `+Edge', extra improvement is obtained, demonstrating that the spatial correlation between edges and textures can be better embedded and absorbed by the texture inpainting network than simply feeding the completed edge maps as extra channels into TexNet.
-The above analyses prove that the edge clues are effective guidance in video inpainting, which helps the network to predict more accurate frames.
+The above analysis proves that the edge clues are effective guidance in video inpainting, which helps the network to predict more accurate frames.
 The inpainted edge map in Fig.~\ref{fig:coarse-fine} shows that ENet is capable of generating completed and detailed structure.
-Indeed, the structure module ENet brings extra time consuming to the baseline TexNet from 7.6335 \emph{fps} to 5.2356 \emph{fps}.
+Indeed, the structure module ENet brings extra time cost to the baseline TexNet from 7.6335 \emph{fps} to 5.2356 \emph{fps}.
 This is deserved, because the inpainting quality is significantly improved.
 
 Fig.~\ref{edgevis} shows the results generated using the three variants. 
-It is obvious that after introducing structure guidance, the inpainted frames become more visually pleasing with sharper object boundaries. 
+It is obvious that after introducing structural guidance, the inpainted frames become more visually pleasing with sharper object boundaries. 
 Besides, the edge maps predicted by our method are reasonable and clear, which well represent the image structure and show the strong edge inpainting ability of ENet. 
 Thus, it is crucial to explore structural details in video inpainting.
  
@@ -269,7 +269,7 @@ Thus it is easier for TexNet to utilize structure information to obtain better r
 
 
 \begin{table}[t]
-	\caption{Comparison of proposed structure attention module (SAM) and simple 2-layer spatial attention on YouTubeVOS. SAM is capable of revealing potential correlation between structure information and video contents. }\smallskip
+	\caption{Comparison of proposed structure attention module (SAM) and simple 2-layer spatial attention on YouTubeVOS. SAM is capable of the revealing potential correlation between structure information and video contents. }\smallskip
 	\scriptsize
 	\centering
 	{
@@ -287,7 +287,7 @@ Thus it is easier for TexNet to utilize structure information to obtain better r
 			
 			\hline
 			
-			+SAM &35.7783    &0.9712  &   5.8786\\
+			+SAM &\textbf{35.7783}    &\textbf{0.9712}  &   \textbf{5.8786}\\
 			\hline
 			
 		
@@ -307,14 +307,14 @@ Thus it is easier for TexNet to utilize structure information to obtain better r
 %Temporal coherence is an important factor in video inpainting. 
 In our method, we utilize temporal information to smoothen artificial flickers via two developed flow-guided warping losses. 
 From Table~\ref{tab:abl}, we can see that the quantitative performance is improved on all three settings by adding the flow guidance. Especially, we only add flow guidance in the training phase, so it can bring gains without extra computation costs during testing.
-The results show that the improvement from the optical flow is smaller than that from the structure edge.
-The reason is that the flow is only used in the training stage as a temporal guidance, while the edge is used during the inference.
+The results show that the improvement from the optical flow is smaller than that from the structural guidance.
+The reason is that the flow is only used in the training stage as temporal guidance, while the edge is used during the inference.
 It should be noted that predicting the completed optical flow among several frames takes more time than the edges during inference.
 Thus, we use the flow in training and the structure edge in both training and testing, which can achieve a good balance between the quality improvement and the inference efficiency. 
 
 
 As shown in Fig.~\ref{flow_vis}, the synthesized contents in neighboring frames become more temporally consistent after adding the flow guidance.
-This proves that the proposed two flow-guided constraints in edge and texture inpainting network are effective in preserving the temporal consistency.
+This proves that the proposed two flow-guided constraints in edge and texture inpainting networks are effective in preserving the temporal consistency.
 %and the color changes between neighboring frames become less obvious after employing flow.
 %The comparison can be better illustrated in the supplementary video.
 %Note that the performance gain from the temporal information is smaller than that from structure guidance in this paper.
@@ -336,10 +336,10 @@ $\lambda_1$ is used in Eq.~\eqref{eq:loss_e_}, which is used to denote the weigh
 From the results in Fig.~\ref{fig:hparam}, when increasing $\lambda_1$ from $0.0$ to $2.0$, the performance gain is obvious, which proves that the feature matching loss is effective in
 generating high-quality edge maps used for the final inpainted results. 
 Then when $\lambda_1$ is increased from $2.0$ to $10.0$, slight improvement is obtained.
-Finally, when $\lambda_1>10.0$, the model performance drops.
+Finally, when $\lambda_1=10.0$, the model obtains the best performance.
 Therefore, we set $\lambda_1$ to $10.0$ for the experimental settings.
 
-As for $\lambda_2$ in Eq.~\eqref{eq:loss_rec}, which is the weight of $l_1$-reconstruction loss of the coarse prediction in TexNet. When $\lambda_2$ is $0.0$, the TexNet is trained without $l_1$-reconstruction loss of the coarse prediction, the result is heavily harmed. It demonstrates that the coarse-to-fine architecture is effective in TexNet. The best performance of result is obtained when $\lambda_2$ is set as $0.2$. And performance drops when $\lambda_2>0.2$, which reflects that the constraints on fine predictions are more important than that on coarse ones.
+As for $\lambda_2$ in Eq.~\eqref{eq:loss_rec}, which is the weight of $l_1$-reconstruction loss of the coarse prediction in TexNet. When $\lambda_2$ is $0.0$, the TexNet is trained without $l_1$-reconstruction loss of the coarse prediction, the result is heavily harmed. It demonstrates that the coarse-to-fine architecture is effective in TexNet. The best performance of the result is obtained when $\lambda_2$ is set as $0.2$. And performance drops when $\lambda_2>0.2$, which reflects that the constraints on fine predictions are more important than that on coarse ones.
 So we set $\lambda_2$ as $0.2$ in experiments.
 %Results are shown in Fig.~\ref{fig:hparam}. As shown, $\lambda_1=10.0,\lambda_2=5.0$ is the best choice.
 
@@ -349,7 +349,7 @@ So we set $\lambda_2$ as $0.2$ in experiments.
 \begin{figure}[!t]
 	\centering
 	\includegraphics[width=1.0\columnwidth]{lamda1} % Reduce the figure size so that it is slightly narrower than the column. Don't use precise values for figure width.This setup will avoid overfull boxes. 
-	\caption{Results of hyper parameters $\lambda_1$ and $\lambda_2$. The best result is gained when $\lambda_1=10.0$ and $\lambda_2=0.2$.}
+	\caption{Results of hyper parameters $\lambda_1$ and $\lambda_2$. The best result is obtained when $\lambda_1=10.0$ and $\lambda_2=0.2$.}
 	\label{fig:hparam}
 \end{figure}
 
