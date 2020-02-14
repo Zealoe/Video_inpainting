@@ -19,7 +19,7 @@ These methods rely heavily on the hypothesis that the missing content in the cor
 %
 Recently, deep-learning-based methods achieve great performance improvement in video inpainting \cite{wang2019video,Kim_2019_CVPR1,Xu_2019_CVPR,Kim_2019_CVPR}.
 A straightforward solution is to utilize 3D convolution layers to extract spatio-temporal features and predict missing contents with smooth motion \cite{wang2019video}.
-To obtain temporally smooth results, contextual information from neighboring frames is aggregated to synthesize corrupted regions using a recurrent feedback scheme~\cite{Kim_2019_CVPR1,Kim_2019_CVPR}, or pixel propagation guided by completed flows. 
+To obtain temporally smooth results, contextual information from neighboring frames is aggregated to synthesize corrupted regions using a recurrent feedback scheme~\cite{Kim_2019_CVPR1,Kim_2019_CVPR}, or pixel propagation guided by completed flows~\cite{Xu_2019_CVPR}. 
 %For example, a deep optical flow completion network is proposed to propagate missing pixels across frames~\cite{Xu_2019_CVPR}. 
 %Kim~\emph{et al.} leverage recurrent feedback to utilize potential information in previous frames~\cite{Kim_2019_CVPR,Kim_2019_CVPR1}.
 By integrating motion guidance, these methods pay more attention to temporal smoothness; however, structure rationality and object details have not been well recovered. 
@@ -108,7 +108,7 @@ In summary, our technical contributions are three-fold:
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=1.01\columnwidth]{zong} % Reduce the figure size so that it is slightly narrower than the column. Don't use precise values for figure width.This setup will avoid overfull boxes. 
-	\caption{Overview of our structure-guided video inpainting network. We first complete the missing edges by aggregating information from neighboring frames to represent the target structure using the ENet. Then, the TexNet synthesizes missing textures under the guidance of structure edges. Besides, the ground truth optical flow between frames is utilized during the training stage of both ENet and TexNet to enforce temporal coherence of completed contents, as illustrated by dotted lines.}
+	\caption{Overview of our structure-guided video inpainting network. We first complete the missing edges by aggregating information from neighboring frames to represent the target structure using the ENet. Then, the TexNet synthesizes missing textures under the guidance of structure edges. Besides, the ground truth optical flow between frames is utilized during the training stage for both ENet and TexNet to enforce temporal coherence of completed contents, as illustrated by dotted lines.}
 	\label{fig:overview}
 \end{figure}
 
@@ -152,7 +152,7 @@ Another group of methods separate foreground and background apart, and then deal
 Ghanbari \emph{et al.} \cite{ghanbari2011contour} first separate the two parts in videos, and fills the two parts accordingly with the help of contours.
 Xia \emph{et al.} \cite{xia2011exemplar} make use of Gaussian mixture models to also distinguish moving foreground and still background, and process them separately.   
 %However, traditional metshods assume that there exist similar contents in known regions, thus fail to synthesize unseen appearances. 
-However, in these patch-based video inpainting methods, the patch-searching process suffers from high computational complexity, thus limits their usage in practical applications.
+However, in these patch-based video inpainting methods, the patch-searching process suffers from high computational complexity, thus limiting their usage in practical applications.
 
 
 
