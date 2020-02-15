@@ -373,6 +373,23 @@ This proves that the proposed two flow-guided constraints in edge and texture in
 
 %Both the quantitative and qualitative results prove that the motion information is beneficial to temporal consistency as well as inpaitning.
 
+
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=0.9\columnwidth]{flow_vis} % Reduce the figure size so that it is slightly narrower than the column. Don't use precise values for figure width.This setup will avoid overfull boxes. 
+	\caption{Inpainting results of three neighboring frames. With the flow constraints during network training, the inpainting results are more temporally consistent without introducing image blurs. }
+	\label{flow_vis}
+\end{figure}
+
+
+
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=1.0\columnwidth]{lamda1} % Reduce the figure size so that it is slightly narrower than the column. Don't use precise values for figure width.This setup will avoid overfull boxes. 
+	\caption{Comparison of hyper parameters $\lambda_1$ and $\lambda_2$. The best result is obtained when $\lambda_1=10.0$ and $\lambda_2=0.2$.}
+	\label{fig:hparam}
+\end{figure}
+
  
 
 
@@ -397,23 +414,6 @@ When $\lambda_2$ is $0.0$, the TexNet is trained without supervision of the coar
 It demonstrates that the coarse-to-fine architecture is effective in TexNet. The best performance is obtained when $\lambda_2=0.2$. And performance drops when $\lambda_2>0.2$, which reflects that the supervision on the fine prediction networks is more important.
 Therefore, we set $\lambda_2$ as $0.2$ in all the other experiments.
 %Results are shown in Fig.~\ref{fig:hparam}. As shown, $\lambda_1=10.0,\lambda_2=5.0$ is the best choice.
-
-
-\begin{figure}[t]
-	\centering
-	\includegraphics[width=0.9\columnwidth]{flow_vis} % Reduce the figure size so that it is slightly narrower than the column. Don't use precise values for figure width.This setup will avoid overfull boxes. 
-	\caption{Inpainting results of three neighboring frames. With the flow constraints during network training, the inpainting results are more temporally consistent without introducing image blurs. }
-	\label{flow_vis}
-\end{figure}
-
-
-
-\begin{figure}[t]
-	\centering
-	\includegraphics[width=1.0\columnwidth]{lamda1} % Reduce the figure size so that it is slightly narrower than the column. Don't use precise values for figure width.This setup will avoid overfull boxes. 
-	\caption{Comparison of hyper parameters $\lambda_1$ and $\lambda_2$. The best result is obtained when $\lambda_1=10.0$ and $\lambda_2=0.2$.}
-	\label{fig:hparam}
-\end{figure}
 
 
 

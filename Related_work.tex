@@ -13,7 +13,7 @@ Though great progress has been made in 2D image inpainting using deep learning t
 
 
 
-Traditional video inpainting methods employ a patch composition framework that composites visually pleasing content in the missing regions via patches by exploiting complementary information across neighboring frames~\cite{patwardhan2007video,wexler2004space,tcsvt2009,newson2014video}.
+Traditional video inpainting methods employ a patch composition framework that composites visually pleasing content in the missing regions via patches by exploiting complementary information across neighboring frames~\cite{patwardhan2007video,wexler2004space,newson2014video}.
 % 
 These methods rely heavily on the hypothesis that the missing content in the corrupted region appears in neighboring frames, which greatly limits their generalization ability.
 %
@@ -141,7 +141,7 @@ Lu \emph{et al.} \cite{lu2018gradient} adopt gradient-based low rank approximati
 These patch-based methods fill the missing content by borrowing and aggregating the most similar patches based on low-level image features from known regions. However, they usually fail when there is insufficient information in known regions or image textures are too complicated.  
 %
 
-\paragraph{Patch-Based Video Inpainting} Patch-based methods are also widely studied for video inpainting. 
+\paragraph{Patch-Based Video Inpainting} Patch-based methods are also widely studied for video inpainting \cite{wexler2007space,tcsvt2009,umeda2012removal}. 
 They search similar patches and borrow appearances from known regions across neighboring frames to synthesize the unknown content. 
 Wexler \emph{et al.} \cite{wexler2007space} constrain masked regions to synthesize coherent structures with respect to reference examples based on local structures. 
 Umeda \emph{et al.} \cite{umeda2012removal} propose using directional median filter as complementation of patch-based filling.
