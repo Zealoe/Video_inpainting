@@ -119,7 +119,7 @@ In summary, our technical contributions are three-fold:
 
 \section{Related Work}
 %Our method are mostly related to (a) traditional image/video inpainting, (b) CNN-based image inpainting, and (c) deep video inpainting. We will introduce them in this section below.
-\paragraph{Traditional Image/Video Inpainting} Image or video inpainting has been studied for decades \cite{li2008patch,zhang2014image,xu2015video}. 
+\paragraph{Traditional Image/Video Inpainting} Image or video inpainting has been studied for decades. 
 %
 Traditional methods of image and video inpainting can be divided into two categories, diffusion-based and patch-based methods. 
 Diffusion-based methods \cite{bertalmio2000image,ballester2001filling,sridevi2019image} gradually propagate contents from surrounding areas to the missing region. 
@@ -130,7 +130,7 @@ Diffusion-based methods \cite{bertalmio2000image,ballester2001filling,sridevi201
 %Fractional-order nonlinear diffusion driven by difference curvature is proposed to produce clearer image details \cite{sridevi2019image}. 
 However, this kind of method fails to handle large holes due to its assumption of local smoothness. 
 %
-Patch-based image inpainting methods, also called exemplar-based methods~\cite{bertalmio2003simultaneous,efros2001image}, are more widely studied.
+Patch-based image inpainting methods, also called exemplar-based methods~\cite{bertalmio2003simultaneous,efros2001image.li2008patch,zhang2014image}, are more widely studied.
 They formulate the completion task as a patch-based optimization problem. 
 Barnes \emph{et al.}~\cite{barnes2009patchmatch} employ approximate nearest neighbor algorithm to fill the damaged regions.
 Sangeetha \emph{et al.}~\cite{sangeetha2011combined} propose to propagate both linear structure and two-dimensional texture into the target region.
@@ -141,11 +141,12 @@ Lu \emph{et al.} \cite{lu2018gradient} adopt gradient-based low rank approximati
 These patch-based methods fill the missing content by borrowing and aggregating the most similar patches based on low-level image features from known regions. However, they usually fail when there is insufficient information in known regions or image textures are too complicated.  
 %
 
-\paragraph{Patch-Based Video Inpainting} Patch-based methods are also widely studied for video inpainting \cite{wexler2007space,tcsvt2009,umeda2012removal}. 
+\paragraph{Patch-Based Video Inpainting} Patch-based methods are also widely studied for video inpainting \cite{wexler2007space,tcsvt2009,umeda2012removal,xu2015video}. 
 They search similar patches and borrow appearances from known regions across neighboring frames to synthesize the unknown content. 
 Wexler \emph{et al.} \cite{wexler2007space} constrain masked regions to synthesize coherent structures with respect to reference examples based on local structures. 
 Umeda \emph{et al.} \cite{umeda2012removal} propose using directional median filter as complementation of patch-based filling.
 Newson \emph{et al.} \cite{newson2014video} extend the 2D PatchMatch algorithm~\cite{barnes2009patchmatch} into 3D version to improve video inpainting quality.
+Xu \emph{et al.} \cite{xu2015video} first complete motion field to guide the patch composition for video background completion.
 Huang \emph{et al.} \cite{huang2016temporally} jointly estimate optical flow and textures to promote temporal coherence.
 %
 Another group of methods separate foreground and background apart, and then deal with the two parts respectively with different algorithms, since there naturally exists property differences between them.  
