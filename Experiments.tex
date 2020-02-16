@@ -18,7 +18,7 @@ YouTubeVOS and DAVIS are widely used for evaluating video inpainting results in 
 YouTubeVOS consists of 4,453 video clips that contain more than 70 categories of common objects. 
 The videos are split into three parts, 3,471 for training, 474 for validation, and 508 for testing. Since YoutubeVOS has no dense foreground mask annotations, we only use it for evaluation under mask settings (1), (2), and (3). 
 % 
-DAVIS dataset contains 90 video sequences that are annotated with foreground object masks for test and 60 unlabeled videos for training.
+DAVIS dataset contains 90 video sequences that are annotated with foreground object masks for testing and 60 unlabeled videos for training.
 
 
 \begin{figure*}[tb]
@@ -130,7 +130,7 @@ Compared with the second-best video inpainting method DFVI \cite{Xu_2019_CVPR}, 
 %
 %% Time performance analysis 
 Both the quantitative and qualitative results demonstrate that our method is not a naive extension to utilize structure information in video inpainting.
-The well designed network architecture fully exploits structural guidance in video inpainting and brings large performance gain.
+The well-designed network architecture fully exploits structural guidance in video inpainting and brings large performance gain.
 
 
 
@@ -349,7 +349,7 @@ While the coarse inpainting network in TexNet effectively produces most low-freq
 %
 As shown in Fig.~\ref{fig:att} (c) and (d), most of these high-frequency information comes from the edge pixels.
 %
-Especially, in term of the foreground pixels, the attention maps show that the refinement network aggregates information mainly from the edge pixels to preserve a consistent and clear object shape, which makes the results visually reasonable, as Fig.~\ref{fig:att} (c) shows.
+Especially, in terms of the foreground pixels, the attention maps show that the refinement network aggregates information mainly from the edge pixels to preserve a consistent and clear object shape, which makes the results visually reasonable, as Fig.~\ref{fig:att} (c) shows.
 In comparison, to complete the background pixels, the SAM adaptively collects information from different regions with relatively lower correlation with the edge pixels, as shown in Fig.~\ref{fig:att} (d).
 %
 In the first and third examples, SAM derives small weights for those edge regions to complete the background pixels with smooth textures. 
@@ -374,7 +374,7 @@ Thus it brings performance gains without extra computation costs during testing.
 %It should be noted that predicting the completed optical flow among several frames takes more time than the edges during inference.
 %Thus, we use the flow in training and the structure edge in both training and testing, which can achieve a good balance between the quality improvement and the inference efficiency. 
 %
-As Fig.~\ref{flow_vis} show, the synthesized contents in neighboring frames become more temporally consistent by adding the flow constrained losses.
+As Fig.~\ref{flow_vis} shows, the synthesized contents in neighboring frames become more temporally consistent by adding the flow constrained losses.
 This proves that the proposed two flow-guided constraints in edge and texture inpainting networks are effective in enhancing temporal consistency.
 %and the color changes between neighboring frames become less obvious after employing flow.
 %The comparison can be better illustrated in the supplementary video.
@@ -419,7 +419,7 @@ The model obtains the best performance at $\lambda_1=10.0$.
 %Therefore, we set $\lambda_1$ to $10.0$ for the experimental settings.
 %
 $\lambda_2$ in Eq.~\eqref{eq:loss_rec} is the weight of $l_1$-reconstruction loss of the coarse prediction in TexNet. 
-When $\lambda_2$ is $0.0$, the TexNet is trained without supervision of the coarse prediction, and the inpainting quality is significantly harmed.
+When $\lambda_2$ is $0.0$, the TexNet is trained without the supervision of the coarse prediction, and the inpainting quality is significantly harmed.
 % the result is heavily harmed. 
 It demonstrates that the coarse-to-fine architecture is effective in TexNet. The best performance is obtained when $\lambda_2=0.2$. And performance drops when $\lambda_2>0.2$, which reflects that the supervision on the fine prediction networks is more important.
 Therefore, we set $\lambda_2$ as $0.2$ in all the other experiments.

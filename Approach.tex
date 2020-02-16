@@ -116,7 +116,7 @@ Specifically, TexNet consists of a coarse inpainting network and a refinement ne
 First, the coarse inpainting network consists of a set of 3D convolutions to capture the spatio-temporal information from the hallucinated edge maps and the corrupted input frames, and produces a rough completion $\boldsymbol{\widetilde{V}}^i$ for the $T$ frames with colors and textures.
 %The 3D coarse network incorporates neighboring frames by convolutions of the time dimension.
 Then, the refinement network takes the rough inpainting results $\boldsymbol{\widetilde{V}}^i$ and the synthesized edge maps $\boldsymbol{\widetilde{E}}$ as inputs to further refine texture details in $\boldsymbol{\widetilde{V}}^i$ with the guidance of structural edges $\boldsymbol{\widetilde{E}}$.
-Notably, only 2D convolutional layers are used in the refinement network to improve the inference efficiency. 
+Notably, only 2D convolutional layers are used in the refinement network to improve inference efficiency. 
 %For the corrupted region, our ENet first completes sparse edges which well represent the structure of the missing content, then TexNet progressively replenishes textures under the guidance of synthesized edges.
 
 Besides taking $\boldsymbol{\widetilde{E}}$ as an auxiliary input in the refinement network, we further design a structure attention module (SAM) to fully encode the structural information.
@@ -136,7 +136,7 @@ After introducing structural guidance in the refinement network, the inpainted c
 
 %Fig.~\ref{fig:coarse-fine} shows an example of our structure-guided inpainting result. 
 
-The coarse inpainting network and the refinement network in TexNet are trained as a whole, define by $G^T$, end-to-end in adversarial manner by:
+The coarse inpainting network and the refinement network in TexNet are trained as a whole, defined by $G^T$, end-to-end in an adversarial manner by:
 %
 \begin{equation}
 	\label{eq:1}
