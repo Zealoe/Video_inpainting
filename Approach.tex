@@ -12,7 +12,7 @@ The detailed architecture of our inpainting network is shown in
 Fig.~\ref{fig:stiNet}.
 It consists of three main components. 
 The first part is an edge inpainting network (ENet) for structure inference that recovers edges in the missing regions of the input frames.
-The second part is a coarse-to-fine texture inpainting network (TexNet) that aims to complete the missing content with visual details under the guidance of hallucinated edges.
+The second part is a coarse-to-fine texture inpainting network (TexNet) that aims to complete the missing contents with visual details under the guidance of hallucinated edges.
 The third part leverages the ground truth motion flow as auxiliary constraints to enforce temporal coherence of both the completed edge maps and textures at the training stage.
 %The ground truth motion flow is employed to guarantee the consistency of edges and aggregate previously synthesized frames to refine the current frame.
 %During the inference stage, only the edge-guided inpainting path is used to complete the target frame, which generates high-quality inpainted results with low time cost.
@@ -23,13 +23,13 @@ The third part leverages the ground truth motion flow as auxiliary constraints t
 \label{sec:edgenet}
  
 The edge inpainting network (ENet) completes image edges in the missing regions to depict scene structures and object shapes.
-\mdf{From $T$ neighboring corrupted frames $\boldsymbol{V}$ as well as the corresponding set of binary masks $\boldsymbol{M}$}, a Canny edge detector is first applied to extract the corresponding edge maps $\boldsymbol{E}^{i}$ in the uncorrupted regions. %Notably, the edges in the masked regions in $\boldsymbol{E}^{i}$ are missed. 
+\mdf{From $T$ neighboring corrupted frames $\boldsymbol{V}$ as well as the corresponding set of binary masks $\boldsymbol{M}$}, a Canny edge detector is first applied to extract the corresponding edge maps $\boldsymbol{E}$ in the uncorrupted regions. %Notably, the edges in the masked regions in $\boldsymbol{E}^{i}$ are missed. 
 %Given the incompleted grayscale images $\boldsymbol{X}^{g}$ of input frame, a canny edge detector is first used to generate initial edge maps. 
 The input of ENet is \mdf{the concatenation of} the incomplete grayscale version of $T$ frames $\boldsymbol{V}^{g}$, initial edge maps $\boldsymbol{E}$, and their corresponding masks $\boldsymbol{M}$.
 %
-As shown in Fig.~\ref{fig:stiNet}, our ENet, denoted by $G^E$, is composed of a two-layer 3D encoder, eight 2D residual blocks, and a two-layer 3D decoder. 
+As shown in Fig.~\ref{fig:stiNet}, our ENet, denoted by $G^E$, is composed of a three-layer 3D encoder, eight 2D residual blocks, and a three-layer 3D decoder. 
 %{\color{blue}Detailed network architecture implementation is listed in Table~\ref{tab:enet-arch1}.}
-The 3D encoder and decoder are designed to \mdf{capture temporal coherence which takes large computation consumption. The intermediate 2D residual blocks are efficient in aggregating spatial contexts in large spatial receptive fields. Under a limited number of network parameters, we can adopt more 2D convolution layers thereby obtain larger spatial receptive fields compared to 3D convolutions.
+The 3D encoder and decoder are designed to \mdf{capture temporal coherence, which takes large computation consumption. The intermediate 2D residual blocks are efficient in aggregating spatial contexts in large spatial receptive fields. Under a limited number of network parameters, we can adopt more 2D convolution layers, thereby obtaining larger spatial receptive fields compared to 3D convolutions.
 This hybrid 2D and 3D convolution network achieves a good balance between spatial and temporal coherence.}
 The inpainted $T$ edge maps 	$\boldsymbol{\widetilde{E}}=\msset{\widetilde{E}}$ are obtained by:
 \begin{equation}
@@ -64,7 +64,7 @@ $\mathcal{L}^E_{fm}$ evaluates the feature-level similarity between ground truth
 	\mathcal{L}^E_{fm}=\sum_{t=1}^T\sum_{k=1}^L{\frac{1}{N_k}\left\| D^E_k({E}_t^{gt},{V}_t^{g})- D^E_k({\widetilde{E}_t},{V}_t^{g})\right\|_1},
 \end{equation}
 where $D^E_k$ is the $k$-th layer in the $L$-layer $D^E$, and $N_k$ is the element number of the output of $D^E_k$.
-\mdf{We use the feature similarity loss $\mathcal{L}^E_{fm}$ instead of L1 reconstruction loss because that L1 reconstruction loss is sensitive to sparse edges.}
+\mdf{We use the feature similarity loss $\mathcal{L}^E_{fm}$ instead of L1 reconstruction loss because that L1 reconstruction loss is sensitive to small drifts and noises due to the sparsity of edge maps.}
 %By considering both feature-level and image-level similarities in Eq.~\eqref{eq:loss_e_}, the edge generator $G^E$ can be trained to produce plausible and structurally rational edge maps.
 %Note that the discriminator $D^E$ is not optimized by the feature matching loss term. It plays as a feature extractor to optimize the generator $G^E$ for producing plausible edge maps $\boldsymbol{E}$.
 As a result, the proposed hybrid 3D and 2D convolution architecture and the adversarial loss enable our ENet to hallucinate the missing edges accurately and efficiently.
@@ -105,7 +105,7 @@ To synthesize realistic frame textures, our TexNet adopts a coarse-to-fine archi
 Specifically, TexNet {\color{blue}$G^T$} consists of a coarse inpainting network {\color{blue}$G_c^T$} and a refinement network {\color{blue}$G_r^T$}.
 %
 %The input of TexNet is the concatenation of  $\boldsymbol{\widetilde{E}}$, $\boldsymbol{V}$, and $\boldsymbol{M}$.
-First, the coarse inpainting network consists of a set of 3D convolutions to capture the spatio-temporal contexts from the hallucinated edge maps and the corrupted input frames, and produces a rough completion $\boldsymbol{\widetilde{V}}^i$ for the $T$ frames with colors and textures. {\color{blue}The input of $G^T_c$ is the concatenation of $T$ frames $\boldsymbol{V}$, the synthesized edge maps $\boldsymbol{\widetilde{E}}$, and the masks $\boldsymbol{M}$ to produce $T$ rough inpainting frames in lower resolution:}
+First, the coarse inpainting network consists of a set of 3D convolutions to capture the spatio-temporal contexts from the hallucinated edge maps and the corrupted input frames, and produces a rough completion $\boldsymbol{\widetilde{V}}^i$ for the $T$ frames with colors and textures. {\color{blue}The input of $G^T_c$ is the concatenation of $T$ frames $\boldsymbol{V}$, the synthesized edge maps $\boldsymbol{\widetilde{E}}$, and the masks $\boldsymbol{M}$ to produce $T$ rough inpainting frames:}
 {\color{blue}
 	\begin{equation}
 	\begin{aligned}
