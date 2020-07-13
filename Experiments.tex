@@ -3,34 +3,7 @@
 To evaluate the effectiveness of our approach, we conduct a series of comparison experiments and ablation studies on two widely used datasets,~\emph{i.e.,} YouTubeVOS \cite{xu2018Youtube} and DAVIS \cite{davis_2017}, under different settings.
 %We test on two datasets, YouTubeVOS \cite{xu2018youtube} and DAVIS \cite{davis_2017}, to compare the proposed STSENet with state-of-the-art methods. %Several ablation studies are conducted to prove the effectiveness of spatial details and temporal information in video inpainting.
 
-\subsection{Experimental Settings}
-\noindent \textbf{Mask Setting.} Considering different real-world applications, we test four kinds of mask settings in this paper, which are different in shapes and positions of the missing regions. 
-%The first and the second settings aims to recover rectangular regions, which are common in watermark removal.
-\begin{enumerate}
-\item Fixed square mask: The size and position of the missing square regions are fixed through the whole video. 
-\item Moving square mask: The position and size of the square masks change over frames. 
-\item Free-from mask: We apply irregular masks which imitate hand-drawn masks on each frame, following \cite{liu2018partialinpainting}. 
-\item Foreground object mask: This type of mask is defined to line out foreground objects in videos and used for testing object removal.
-\end{enumerate}
 
-\noindent\textbf{Dataset.} 
-YouTubeVOS and DAVIS are widely used for evaluating video inpainting results in recent studies.
-YouTubeVOS consists of 4,453 video clips that contain more than 70 categories of common objects. 
-The videos are split into three parts, 3,471 for training, 474 for validation, and 508 for testing. Since YoutubeVOS has no dense foreground mask annotations, we only use it for evaluation under mask settings (1), (2), and (3). 
-% 
-DAVIS dataset contains 90 video sequences that are annotated with foreground object masks for testing and 60 unlabeled videos for training.
-
-
-
-
-
-
-\begin{figure*}[tb]	
-\centering	
-	\includegraphics[width=\textwidth]{viszong} % Reduce the figure size so that it is slightly narrower than the column. 	Don't use precise values for figure width.This setup will avoid overfull boxes. 
-	\caption{Comparison with state-of-the-art methods on the YouTubeVOS dataset under different mask settings. Our method 	produces results with more complete object structures and finer details.}	
-\label{viszong}
-\end{figure*}
 
 \begin{table*}[t]
 	\caption{Comparisons with six state-of-the-art methods on YouTubeVOS. Our method outperforms all other methods on three video quality metrics, with comparable temporal smoothness and fast inference speed.}\smallskip
@@ -98,6 +71,37 @@ DAVIS dataset contains 90 video sequences that are annotated with foreground obj
 \end{table*}
 
 
+\subsection{Experimental Settings}
+\noindent \textbf{Mask Setting.} Considering different real-world applications, we test four kinds of mask settings in this paper, which are different in shapes and positions of the missing regions. 
+%The first and the second settings aims to recover rectangular regions, which are common in watermark removal.
+\begin{enumerate}
+\item Fixed square mask: The size and position of the missing square regions are fixed through the whole video. 
+\item Moving square mask: The position and size of the square masks change over frames. 
+\item Free-from mask: We apply irregular masks which imitate hand-drawn masks on each frame, following \cite{liu2018partialinpainting}. 
+\item Foreground object mask: This type of mask is defined to line out foreground objects in videos and used for testing object removal.
+\end{enumerate}
+
+\noindent\textbf{Dataset.} 
+YouTubeVOS and DAVIS are widely used for evaluating video inpainting results in recent studies.
+YouTubeVOS consists of 4,453 video clips that contain more than 70 categories of common objects. 
+The videos are split into three parts, 3,471 for training, 474 for validation, and 508 for testing. Since YoutubeVOS has no dense foreground mask annotations, we only use it for evaluation under mask settings (1), (2), and (3). 
+% 
+DAVIS dataset contains 90 video sequences that are annotated with foreground object masks for testing and 60 unlabeled videos for training.
+
+
+
+
+
+
+\begin{figure*}[tb]	
+\centering	
+	\includegraphics[width=\textwidth]{viszong} % Reduce the figure size so that it is slightly narrower than the column. 	Don't use precise values for figure width.This setup will avoid overfull boxes. 
+	\caption{Comparison with state-of-the-art methods on the YouTubeVOS dataset under different mask settings. Our method 	produces results with more complete object structures and finer details.}	
+\label{viszong}
+\end{figure*}
+
+
+
 \noindent \textbf{Implementation details.} 
 All the models are tested on a TITAN X (Pascal) GPU with frame size $256 \times 256$.
 For training data, we randomly sample a training clip every 40 frames from each video in the dataset. Our training process consists of three steps. First, we train ENet with learning rate set as $1e-4$ for $G^E$ and $1e-5$ for $D^E$. 
@@ -120,7 +124,6 @@ Four commonly-used metrics, including structural similarity index (SSIM) \cite{w
 For each training video at mask setting (4), we randomly select a test video from the 90 test videos in the DAVIS dataset and apply its masks for the current training video with random rotation, scaling, and translation.
 Our inpainting network is first trained on the YoutubeVOS dataset and then finetuned on the DAVIS dataset. 
 Since there are no ground truth video for mask setting (4) of foreground object removal, it is infeasible to do quantitative evaluations to measure the output quality. Instead, a user study is conducted.  
-
 
 
 
@@ -355,7 +358,7 @@ Thus, it is crucial to explore structural details in video inpainting.
 \subsubsection{Analysis of the Structure Attention Module}
 We propose a novel structure attention module (SAM) in TexNet to encode the structure information of edge maps into the texture inpainting. 
 {\color{blue}
-Here, to proves the effectiveness of SAM in exploiting the structure information, we conduct a comparison experiment between the proposed SAM and two other commonly used variants of attention module in Table~\ref{tab:sam_com}. SimATT: a simple 2-layer attention \cite{min2019two},~\emph{i.e.,} using a 2-layer convolution network to extract a spatial attention map from predicted edge maps, which is then applied to the same video feature as SAM. SelfATT: self attention module \cite{vaswani2017attention}. The self attention takes only features of video as input, without edge structure input, and is also applied to the same video features as SAM.   The model `+Edge' is used as the baseline. Results are shown in Table~\ref{tab:sam_com}. SimATT lacks the edge-texture interaction during attention generation, which performs worse than SAM. The SelfATT applies the general self-attention module to only the video features without edge guidance, thus SAM obtains the best performance. The results prove that structure information is useful in video inpainting task, and the proposed SAM is more effective in revealing potential correlation between structure information in edge maps and video contents.
+Here, to prove the effectiveness of SAM in exploiting the structure information, we conduct a comparison experiment between the proposed SAM and two other commonly used variants of attention module. SimATT: a simple 2-layer attention \cite{min2019two},~\emph{i.e.,} using a 2-layer convolution network to extract a spatial attention map from predicted edge maps, which is then applied to the same video feature as SAM. SelfATT: self attention module \cite{vaswani2017attention}. The self attention takes only features of video as input, without edge structure input, and is also applied to the same video features as SAM.   The model `+Edge' is used as the baseline. Results are shown in Table~\ref{tab:sam_com}. SimATT lacks the edge-texture interaction during attention generation, which performs worse than SAM. SelfATT applies the general self-attention module to the video features only, without edge guidance. It leads to better results than adding simple attention. By adding edge guidance in our SAM, we obtain better results than SimATT and SelfATT. The results prove that structure information is useful in video inpainting task, and the proposed SAM is more effective in revealing potential correlation between structure information in edge maps and video contents.
 	
 }
 
@@ -395,7 +398,8 @@ The visualization shows that the proposed SAM exploits information from the edge
 
 {\color{blue}
 \subsubsection{Different Architectures of ENet}
-We adopt a hybrid 3D+2D convolution architecture for ENet. To justify such a design, we compare our hybrid 3D+2D architecture with two variants: 1) Variant-1: directly replacing the 2D convolutions of ENet with 3D convolution, which has the same layer numbers with our hybrid 3D+2D architecture; and 2) Variant-2: replacing the 2D part with fewer \#layer 3D convolutions to keep the parameter numbers similar to our architecture. The results are shown in Table \ref{tab:com-enet-arch}. It can be seen that the performance of Variant-1 is slightly better than ours, because 3D convolutions can capture finer temporal details and introduce spatial information from features of neighbor frames. However, it takes $\sim2.5\times$ \#Params over our hybrid 3D+2D architecture, which is a huge burden. Variant-2 has lower generation quality because of its shallow intermediate layers. Consequently, our hybrid 3D+2D convolutions architecture can achieve comparable results with Variant-1 but much fewer \#Params, which proves its good balance between computation cost and performance.
+We adopt a hybrid 3D+2D convolution architecture for ENet. To justify such a design, we compare our hybrid 3D+2D architecture with two variants: 1) Variant-1: directly replacing the 2D convolutions of ENet with 3D convolutions, which has the same layer numbers with our hybrid 3D+2D architecture; and 2) Variant-2: replacing the 2D part with fewer 3D convolution layers while keeping similar number of network parameters with our current architecture. The results are shown in Table \ref{tab:com-enet-arch}. It can be seen that the performance of Variant-1 is slightly better than ours, because 3D convolutions can capture finer temporal details and introduce spatial information from features of neighbor frames. However, it takes $\sim2.5\times$ parameter numbers over our hybrid 3D+2D architecture, which is a huge burden. Variant-2 results in lower generation quality because of its shallower intermediate layers. 
+In comparison, our hybrid 3D+2D convolutions architecture can achieve comparable results with Variant-1 but much fewer parameters, demonstrating its better balance between computational cost and inpainting quality.
 
 }
 
@@ -637,7 +641,8 @@ Therefore, we set $\lambda_2$ as $0.2$ in all the other experiments.
 {\color{blue}
 	\subsubsection{Different frame gaps}
 	
-	 We conduct experiments to evaluate the effects of different frame gaps. In our default setting, we use $T$ frame $\msset{V}$ as input in our method. In this experiment, we try a small gap, $\{V_{t-4},V_{t-2},V_{t},V_{t+2},V_{t+4}\}$, and a large gap, $\{V_{t-15},V_{t-8},V_{t},V_{t+8},V_{t+15}\}$ . Results are shown in Table \ref{tab:input-gap}, which show that: a) the smaller gap will make inpainting results temporally smoother but may lose some distant frame information, and b) the larger gap will harm both spatial and temporal coherence, because it may introduce noise from long-range frames. So we finally choose a trade-off setting with gap of $\msset{V}$, which achieves a balanced performance.
+We conduct experiments to evaluate the effects of different frame gaps. In our default setting, we use $T$ frame $\msset{V}$ as input in our method. In this experiment, we try a small gap, $\{V_{t-4},V_{t-2},V_{t},V_{t+2},V_{t+4}\}$, and a large gap,
+$\{V_{t-15},V_{t-8},V_{t},V_{t+8},V_{t+15}\}$. Results are shown in Table \ref{tab:input-gap}, which show that: a) the smaller gap will make inpainting results temporally smoother but may lose some distant frame information, and b) the larger gap will harm both spatial and temporal coherence, because it may introduce noise from long-range frames. So we finally choose a trade-off setting with gap of $\msset{V}$, which achieves a balanced performance.
 
 }
 
