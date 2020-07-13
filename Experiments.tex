@@ -33,7 +33,7 @@ DAVIS dataset contains 90 video sequences that are annotated with foreground obj
 \end{figure*}
 
 \begin{table*}[t]
-	\caption{Comparisons with four state-of-the-art methods on YouTubeVOS. Our method outperforms all other methods on three video quality metrics, with fast inference speed.}\smallskip
+	\caption{Comparisons with six state-of-the-art methods on YouTubeVOS. Our method outperforms all other methods on three video quality metrics, with comparable temporal smoothness and fast inference speed.}\smallskip
 	
 	\centering
 	\resizebox{2.0\columnwidth}{!}{
@@ -134,23 +134,23 @@ We train \cite{nazeri2019edgeconnect,Xu_2019_CVPR} using their published codes a
 The quantitative results and inference speeds are reported in Table~\ref{tab:sem}.
 It can be seen that our method outperforms state-of-the-art methods on most of metrics of generation quality.
 First, in terms of three metrics of PSNR, SSIM, and FID about frame quality, our method outperforms all other methods, which demonstrates the effectiveness of introducing structure guidance into video inpainting.
-Especially, compared with the 2D image inpainting method Edge-Connect\cite{nazeri2019edgeconnect}, which also predicts edges to represent the target structure, our method greatly increases the completion performance by leveraging neighboring frames to complete edges and synthesize textures. 
+Especially, compared with the 2D image inpainting method Edge-Connect~\cite{nazeri2019edgeconnect}, which also predicts edges to represent the target structure, our method greatly increases the completion performance by leveraging neighboring frames to complete edges and synthesize textures. 
 Compared with other flow-based video inpainting methods without edge enhancement, our method shows great superiority, which can generate more temporally coherent and realistic contents. 
 
 {\color{blue}
 Second, in terms of Tem-ERR about temporal smoothness, our method outperforms most of existing methods, which proves that the temporal consistency constraint can exactly facilitate texture smoothness.
 Specifically, in Table~\ref{tab:sem}, our method is comparable with DFVI and worse than DVI.
-The reason is that DVI uses a recurrent feedback loop and a memory layer (LSTM) for temporal consistency, which has a strong ability of modeling temporal dependency, and DFVI iteratively propagates pixels using optical flow. Both DFVI and DVI focus on designing complex temporal modules to obtain smooth inpainting, thereby obtaining more smoothing results but much slower inference speed than our method. More importantly, under edge-guidance, our method generates results with fine structural details, which obtains obviously higher (PSNR, SSIM, FID) than DFVI and DVI.
+The reason is that DVI uses a recurrent feedback loop and a memory layer (LSTM) for temporal consistency, which has a strong ability of modeling temporal dependency. DFVI iteratively propagates pixels using optical flow. Both DFVI and DVI focuses on designing temporal modules to obtain smooth inpainting, thereby obtaining more smoothing results but much slower inference speed than our method. More importantly, under edge guidance, our method generates results with fine structural details, which obtains obviously higher generation quality (PSNR, SSIM, FID) than DFVI and DVI.
 }
 
 Third, our method is also very efficient, e.g., four times faster than DVI \cite{Kim_2019_CVPR1} and nine times faster than DFVI \cite{Xu_2019_CVPR}. 
 The inference speed of Edge-Connect is faster than our method since it does not consider axillary temporal information between frames. 
-This result shows that our ENet and temporal consistency constraints are efficient and effective. 
+%This result shows that our ENet and temporal consistency constraints are efficient and effective. 
 
 
 
-{\color{blue} Besides, OPN \cite{oh2019onion} and Copy-and-Paste \cite{lee2019copy} are two recent methods that also leverage self-attention.
-However, they only consider texture interaction via attention, while ignoring the important edge-texture correlation.
+{\color{blue} Besides, OPN \cite{oh2019onion} and Copy-and-Paste \cite{lee2019copy} are two recent methods that leverage non-local correlation between reference and target frames.
+However, they only consider texture interaction between video frames, while ignoring the important edge-texture correlation.
 Thus, the generation quality of our method is superior to that of both two methods with higher inference speed. It shows that the structure information introduced by edge guidance is important in video inpainting, and our method is capable of exploiting the correlation between video contents and object structures. }
 %
 %% Time performance analysis 
@@ -389,7 +389,7 @@ In comparison, to complete the background pixels, the SAM adaptively collects in
 In the first and third examples, SAM derives small weights for those edge regions to complete the background pixels with smooth textures. 
 For the background pixels in the second and fourth examples, high-frequency information is necessary, where the SAM derives higher weights for edge pixels in the attention maps.  
 %
-While the proposed SAM mainly exploits information from the edge pixels for the refinement network, the sparsity of the hallucinated edges greatly improves the computational efficiency, showing that the proposed structure attention module is effective in embedding the structural guidance into high-quality texture generation.
+The visualization shows that the proposed SAM exploits information from the edge pixels for the refinement network, which is effective in embedding the structural guidance into high-quality texture generation.
 
 
 
