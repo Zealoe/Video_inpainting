@@ -64,7 +64,7 @@ $\mathcal{L}^E_{fm}$ evaluates the feature-level similarity between ground truth
 	\mathcal{L}^E_{fm}=\sum_{t=1}^T\sum_{k=1}^L{\frac{1}{N_k}\left\| D^E_k({E}_t^{gt},{V}_t^{g})- D^E_k({\widetilde{E}_t},{V}_t^{g})\right\|_1},
 \end{equation}
 where $D^E_k$ is the $k$-th layer in the $L$-layer $D^E$, and $N_k$ is the element number of the output of $D^E_k$.
-\mdf{We use the feature similarity loss $\mathcal{L}^E_{fm}$ instead of L1 reconstruction loss because that L1 reconstruction loss is sensitive to small drifts and noises due to the sparsity of edge maps.}
+\mdf{We use the feature similarity loss $\mathcal{L}^E_{fm}$ instead of L1 reconstruction loss because that L1 reconstruction loss is sensitive to small drifts and noises for sparse edge maps.}
 %By considering both feature-level and image-level similarities in Eq.~\eqref{eq:loss_e_}, the edge generator $G^E$ can be trained to produce plausible and structurally rational edge maps.
 %Note that the discriminator $D^E$ is not optimized by the feature matching loss term. It plays as a feature extractor to optimize the generator $G^E$ for producing plausible edge maps $\boldsymbol{E}$.
 As a result, the proposed hybrid 3D and 2D convolution architecture and the adversarial loss enable our ENet to hallucinate the missing edges accurately and efficiently.
