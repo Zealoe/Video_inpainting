@@ -15,7 +15,8 @@ These methods rely heavily on the hypothesis that the missing content in the cor
 %
 Recently, deep-learning-based methods have achieved great performance improvement in video inpainting \cite{wang2019video,Kim_2019_CVPR1,Xu_2019_CVPR,Kim_2019_CVPR,lee2019copy,oh2019onion}.
 A straightforward solution is to utilize 3D convolution layers to extract spatio-temporal features and predict missing contents with smooth motion \cite{wang2019video}.
-To obtain temporally smooth results, contextual information from previous frames is aggregated to synthesize corrupted regions using a recurrent feedback scheme~\cite{Kim_2019_CVPR1,Kim_2019_CVPR}, pixel propagation guided by completed flows~\cite{Xu_2019_CVPR}, or copying similar contents from neighbouring frames \cite{lee2019copy,oh2019onion}.  
+To obtain temporally smooth results, contextual information from previous frames is aggregated to synthesize corrupted regions using a recurrent feedback scheme~\cite{Kim_2019_CVPR1,Kim_2019_CVPR}, pixel propagation guided by completed flows~\cite{Xu_2019_CVPR}, 
+{\color{blue}or copying similar contents from neighbouring frames \cite{lee2019copy,oh2019onion}.}  
 By integrating motion guidance, these methods pay more attention to temporal smoothness; however, structure rationality and object details have not been well explored. 
 
 

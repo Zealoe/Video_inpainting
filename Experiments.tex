@@ -24,67 +24,6 @@ DAVIS dataset contains 90 video sequences that are annotated with foreground obj
 
 
 
-\begin{table}[t]
-	\caption{ENet architecture details. }\smallskip
-	\scriptsize
-	\centering
-	{
-		\smallskip\begin{tabular}{c|c|c|c|c}
-			\hline\hline
-			\textbf{Network} & \textbf{Arch} & \textbf{Operation} & \textbf{Kernel size} & \textbf{Output channels}  \\ \hline \hline
-			&\multirow{2}{*}{ Encoder} &	Conv3D  & (3,7,7) & [64]  \\ \cline{3-5}
-			
-			& & 	Conv3D &  (3,4,4) & [128,256]  \\ 
-			\cline{2-5}
-			$G^E$	& ResnetBlock & DilatedConv2D &  (3,3) &[256]*8 \\ 
-			\cline{2-5}
-			& \multirow{2}{*}{Decoder} & 	ConvTranspose3D &  (3,4,4) & [128,64]  \\ \cline{3-5}
-			& & 	ConvTranspose3D &  (3,7,7) & [1]  \\ \hline \hline
-			
-			$D^E$& & Conv2D & (4,4) & [64,128,256,512,1] \\ \hline
-			
-		\end{tabular}
-	}
-	\label{tab:enet-arch1}
-\end{table}
-
-
-\begin{table}[t]
-	\caption{TexNet architecture details. We use Gated convolution for the whole network, which is omitted for space saving. DeConvBlock denotes Deconv+Conv. }\smallskip
-	\scriptsize
-	\centering
-	{
-		\smallskip\begin{tabular}{c|c|c|c|c}
-			\hline\hline
-			\textbf{Network} &\textbf{Arch} & \textbf{Operation} & \textbf{Kernel size} & \textbf{Output channels} \\ \hline \hline
-			\multirow{13}{*}{$G^T$}	& & Conv3D  & (3,5,5) & [16]  \\ \cline{3-5}
-			& & Conv3D  & (3,3,3) & [32,64,128] 
-			\\ \cline{3-5}
-			& Coarse 	 & DilatedConv3D  & (3,3,3) & [256,256,256]
-			\\ \cline{3-5}
-			&	& Conv3D  & (3,3,3) & [128]  \\ \cline{3-5}
-			&	& DeConvBlock3D  & (3,3,3) & [32,3]  \\ \cline{2-5}
-			& \multirow{8}{*}{Refine} & Conv2D & (5,5) & [64]\\ \cline{3-5}
-			&& Conv2D & (3,3) & [128,128,256,256] \\ \cline{3-5}
-			&	& DilatedConv2D & (3,3) & [256,256,256,256] \\ \cline{3-5}
-			
-			&& Conv2D & (3,3) & [256] \\ \cline{3-5}
-			
-			
-			&& SAM & - & [256] \\ \cline{3-5}
-			
-			&& Conv2D & (3,3) & [256] \\ \cline{3-5}
-			
-			&& DeConvBlock2D & (3,3) & [128,32] \\ \cline{3-5}	
-			
-			&& Conv2D & (3,3) & [3] \\ \hline \hline
-			
-			$D^T$ & & Conv2D & (4,4) & [64,128,256,512,1] \\ \hline
-			
-		\end{tabular}
-	}
-	\label{tab:tex-arch}
-\end{table}
 
 \begin{figure*}[tb]	
 \centering	
@@ -169,10 +108,8 @@ An Adam optimizer with $\beta=(0.9, 0.999)$ is used for all sub-network training
 %We do not use weight decay.
 As for the hyper-parameters, we set $\lambda_1=10.0,\lambda_2=0.2$, which will be analysed later. 
 %, \lambda_3=0.1$.
-
-{\color{blue}
-The detailed network architectures of ENet and TexNet are listed in Table \ref{tab:enet-arch1} and Table \ref{tab:tex-arch}, respectively.
-During inference, we sequentially feed frames into the network. The network takes 5 frames as input and output the middle reconstructed frame in one forward pass.
+{\color{blue} The detailed network architectures of ENet and TexNet are listed in the supplementary material.
+During inference, we sequentially feed frames into the network. The network takes 5 frames as input and output the reconstructed frame $\widetilde{V}_t$ in one forward pass.
 }
 
 \noindent \textbf{Evaluation Metrics.} 
@@ -201,9 +138,9 @@ Especially, compared with the 2D image inpainting method Edge-Connect\cite{nazer
 Compared with other flow-based video inpainting methods without edge enhancement, our method shows great superiority, which can generate more temporally coherent and realistic contents. 
 
 {\color{blue}
-Second, in terms of Tem-ERR about temporal smoothness, our method outperforms most of existing methods, which proves that the temporal consistency constraint can exactly facilitate both edge and texture smoothness.
+Second, in terms of Tem-ERR about temporal smoothness, our method outperforms most of existing methods, which proves that the temporal consistency constraint can exactly facilitate texture smoothness.
 Specifically, in Table~\ref{tab:sem}, our method is comparable with DFVI and worse than DVI.
-The reason is that DVI uses a recurrent feedback loop and a memory layer (LSTM) for temporal consistency, which has a strong ability of modeling temporal dependency, and DFVI iteratively propagates pixels using optical flow. Both DFVI and DVI focus on designing complex temporal modules to obtain smooth inpainting, thereby obtaining more smoothing results but much slower inference speed than our method. More importantly, under edge-guidance, our method generates results with fine structural details, which obtains obviously higher (PSNR, SSIM, FID) than DFVI and DIV.
+The reason is that DVI uses a recurrent feedback loop and a memory layer (LSTM) for temporal consistency, which has a strong ability of modeling temporal dependency, and DFVI iteratively propagates pixels using optical flow. Both DFVI and DVI focus on designing complex temporal modules to obtain smooth inpainting, thereby obtaining more smoothing results but much slower inference speed than our method. More importantly, under edge-guidance, our method generates results with fine structural details, which obtains obviously higher (PSNR, SSIM, FID) than DFVI and DVI.
 }
 
 Third, our method is also very efficient, e.g., four times faster than DVI \cite{Kim_2019_CVPR1} and nine times faster than DFVI \cite{Xu_2019_CVPR}. 
@@ -504,7 +441,10 @@ We adopt a hybrid 3D+2D convolution architecture for ENet. To justify such a des
 
 %Temporal coherence is an important factor in video inpainting. 
 We utilize temporal information to smoothen artificial flickers via two developed flow-guided warping losses during training. 
-Table~\ref{tab:abl} shows that the quantitative performance is improved on all three mask settings by adding the flow guidance. Especially, we only add flow guidance in the training phase. 
+Table~\ref{tab:abl} shows that the quantitative performance is improved on all three mask settings by adding the flow guidance. 
+{\color{blue}According to the metric of Tem-ERR, our results are temporally smoother when the generation quality improves as gradually adding edge and SAM. Adding the guidance of optical flow brings huge enhancement to temporal consistency. This demonstrates the effect of flow guidance.
+}
+Especially, we only add flow guidance in the training phase. 
 Thus it brings performance gains without extra computation costs during testing.
 %However, the performance improvement brought by the flow constraints is smaller than the gain caused by structural guidance.The reason is that the flow is only used in the training stage as temporal guidance, while the edge is used during the inference.
 %It should be noted that predicting the completed optical flow among several frames takes more time than the edges during inference.
@@ -683,7 +623,7 @@ Therefore, we set $\lambda_2$ as $0.2$ in all the other experiments.
 	
 	
 	
-	Ours &36.7582 & 0.9790 &3.7577  \\
+	Ours &\textbf{36.7582} & \textbf{0.9790} &\textbf{3.7577}  \\
 	\hline
 		
 			
@@ -707,7 +647,7 @@ Therefore, we set $\lambda_2$ as $0.2$ in all the other experiments.
 {\color{blue}	To investigate the stability of our method on different hole sizes, we compare the performance of experimental methods on three hole settings, of which the results are listed in Table \ref{tab:holesize_com}. The experiments are conducted on corrupted images with fixed square mask setting. The three kinds of hole sizes are: 1) Large hole: $120\times120$. 2) Medium hole: $60\times60$. 3) Small hole: $30\times30$. As shown in Table \ref{tab:holesize_com}, the performance of all the methods drops heavily when testing on larger holes. Our method achieves the best performance under most circumstances, except for the PSNR under the large hole size. The PSNR under large hole size of method is slightly worse than that of OPN, which copies useful information from other frames. However, our method is much better than OPN under other settings. The results show that the performance of our method is stable on different hole sizes.
 
 \subsubsection{Generalization to  Different Input Resolution}
-We also conduct experiments on higher resolution. We use models trained on small sizes to test on image size $1024\times512$. Results are shown in Table \ref{tab:higherres_com}. Notably, OPN is be compared, which takes too much memory cost and cannot be deployed on the GPU we use. The results demonstrate that our method can achieve decent performance under high resolution. 
+We also conduct experiments on higher resolution. We use models trained on small sizes to test on image size $1024\times512$. Results are shown in Table \ref{tab:higherres_com}. Notably, OPN is not compared, which takes too much memory cost and cannot be deployed on the GPU we use. The results demonstrate that our method can achieve decent performance under high resolution. 
 }
  
 
