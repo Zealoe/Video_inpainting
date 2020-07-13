@@ -202,7 +202,7 @@ $k$ denotes the index of neighboring frames ($k\in \left\{-7,-3,+3,+7 \right\}$)
 
  
 
-\mdf{Similarly, when we train the TexNet, we further enforce the temporal coherence of synthesized neighboring frames via a flow-guided texture consistency $\mathcal{L}^T_{ftc}$ by:} 
+\mdf{Similarly, when we train the TexNet, we further enforce the temporal coherence of synthesized neighboring frames via a flow-guided texture consistency $\mathcal{L}^T_{flow}$ by:} 
 \begin{equation}
 	\label{eq:inp_flow}
 		\mathcal{L}^T_{flow}=\sum_{k}\frac{1}{\left\|M_{t} \right\|_1}\left\|\Big(\widetilde{V}_{t}-\phi\big(O_{t\Rightarrow t+k},V_{t+k}^{gt}\big)\Big)\odot M_{t}\right\|_1,
