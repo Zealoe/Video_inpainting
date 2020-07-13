@@ -467,15 +467,14 @@
 \begin{abstract}
 A fundamental challenge in video inpainting is the difficulty of generating video contents with fine details, while keeping spatio-temporal coherence in the missing region. 
 Recent studies focus on synthesizing temporally smooth pixels by exploiting the flow information, while ignoring maintaining the semantic structural coherence between frames.
-This makes them suffer from over-smoothing and blurry contours, which significantly reduces the visual quality of inpainting results. 
+This makes them suffer from over-smoothing and blurry contours, which significantly reduce the visual quality of inpainting results. 
 To address this issue, we present a novel structure-guided video inpainting approach that enhances temporal structure coherence to improve video inpainting results. 
-In contrast to directly synthesizing the missing pixel colors, we first complete the edges in the missing regions to depict scene structures and object shapes via an edge inpainting network with 3D convolutions. 
-Then, we replenish textures using a coarse-to-fine synthesis network with a structure attention module (SAM), under the guidance of the completed edges.
+In contrast to directly synthesizing the missing pixel colors, we first complete edges in the missing regions to depict scene structures and object shapes via an edge inpainting network with 3D convolutions. 
+Then, we replenish textures using a coarse-to-fine synthesis network with a structure attention module (SAM), under the guidance of the synthesized edges.
 Specifically, our SAM is designed to model the semantic correlation between video textures and structural edges to generate more realistic contents.
-Besides, flow between neighboring frames is employed to enhance temporal consistency for self-supervision during training the edge inpainting and texture inpainting modules.
-%, which can: a) enforce temporal consistency between the synthesized adjacent edge maps and b) smoothen flickers in the inpainting results via temporal consistency constraints. 
-Consequently, the inpainting results using our approach are visually pleasing with fine details and temporal coherence in low computational cost. 
-Experiments on the YouTubeVOS and DAVIS datasets show that our method obtains state-of-the-art performance under multiple different video inpainting settings.
+Besides, motion flows between neighboring frames are employed to enhance temporal consistency for self-supervision during training the edge inpainting and texture inpainting modules.
+Consequently, the inpainting results using our approach are visually pleasing with fine details and temporal coherence. 
+Experiments on the YouTubeVOS and DAVIS datasets show that our method obtains state-of-the-art performance under diverse video inpainting settings.
 
 \end{abstract}
 
@@ -506,13 +505,13 @@ Video inpainting, Structure guidance, Flow Assistance.
 
 
 \section{Conclusion}\label{sec:conclu}
-In this paper, we propose a novel structure-guided video inpainting approach which effectively utilizes structure information to recover fine-detailed content in corrupted videos.
+In this paper, we propose a novel structure-guided video inpainting approach which effectively utilizes structural information to recover fine-detailed content in corrupted videos.
 We first infer the target structure by predicting sparse edges in the missing region using an edge inpainting network. 
 Then under the guidance of hallucinated edges, the missing content can be synthesized using the proposed coarse-to-fine texture network.
 %
-The proposed structure attention module effectively exploits the correlation between structure and textures to improve the visual quality by producing more complete structure and visual details.
+We propose a structure attention module that effectively exploits the correlation between structures and textures to improve the visual quality by producing more complete structure and visual details.
 %
-Besides, the temporal coherence of the inpainting frames is further enhanced by our flow-assisted losses.
+Moreover, the temporal coherence of completed frames is further enhanced by our flow-assisted losses.
 Experiments on YouTubeVOS and DAVIS datasets under various mask settings demonstrate the effectiveness of our method on video inpainting and restoration tasks.
 
 
