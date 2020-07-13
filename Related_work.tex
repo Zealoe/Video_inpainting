@@ -17,9 +17,9 @@ Traditional video inpainting methods employ a patch composition framework that c
 % 
 These methods rely heavily on the hypothesis that the missing content in the corrupted region appears in neighboring frames, which greatly limits their generalization ability.
 %
-Recently, deep-learning-based methods achieve great performance improvement in video inpainting \cite{wang2019video,Kim_2019_CVPR1,Xu_2019_CVPR,Kim_2019_CVPR}.
+Recently, deep-learning-based methods achieve great performance improvement in video inpainting \cite{wang2019video,Kim_2019_CVPR1,Xu_2019_CVPR,Kim_2019_CVPR,lee2019copy,oh2019onion}.
 A straightforward solution is to utilize 3D convolution layers to extract spatio-temporal features and predict missing contents with smooth motion \cite{wang2019video}.
-To obtain temporally smooth results, contextual information from neighboring frames is aggregated to synthesize corrupted regions using a recurrent feedback scheme~\cite{Kim_2019_CVPR1,Kim_2019_CVPR}, or pixel propagation guided by completed flows~\cite{Xu_2019_CVPR}. 
+To obtain temporally smooth results, contextual information from neighboring frames is aggregated to synthesize corrupted regions using a recurrent feedback scheme~\cite{Kim_2019_CVPR1,Kim_2019_CVPR}, and pixel propagation guided by completed flows~\cite{Xu_2019_CVPR}. 
 %For example, a deep optical flow completion network is proposed to propagate missing pixels across frames~\cite{Xu_2019_CVPR}. 
 %Kim~\emph{et al.} leverage recurrent feedback to utilize potential information in previous frames~\cite{Kim_2019_CVPR,Kim_2019_CVPR1}.
 By integrating motion guidance, these methods pay more attention to temporal smoothness; however, structure rationality and object details have not been well recovered. 
@@ -46,7 +46,8 @@ Notably, such a structure-texture relevance can effectively improve the inpainti
 %Third, motion
 Furthermore, to enhance the temporal coherence of synthesized frames, we employ motion flows for consistency check of both edge maps and inpainted frames during the training stage.
 %
-The ground truth optical flow is exploited to guide both ENet and TexNet to generate temporal smooth edge maps and texture results via edge consistency and frame warping losses.%,~\emph{i.e.,} the flow-guided edge warping loss and frame warping loss.
+The ground truth optical flow is exploited to guide both ENet and TexNet to generate temporal smooth edge maps and texture results via edge consistency and frame warping losses.
+%,~\emph{i.e.,} the flow-guided edge warping loss and frame warping loss.
 % are respectively utilized to align the edge maps and final inpainted texture between frames. 
 Consequently, the inpainted frames using our approach are not only temporally consistent, but also more complete in structure and rich in visual details.
 
@@ -91,14 +92,14 @@ Consequently, the inpainted frames using our approach are not only temporally co
 We conduct a series of experiments on the YouTubeVOS and DAVIS datasets under different mask settings. 
 The results show that the proposed method obtains new state-of-the-art inpainting performance both quantitatively and qualitatively. 
 %
-Because of the sparsity of edge maps, the computational cost is also greatly reduced.
+%Because of the sparsity of edge maps, the computational cost is also greatly reduced.
 %
 In summary, our technical contributions are three-fold:
 \begin{itemize}
 	\item We propose a novel structure-guided video inpainting method which integrates scene structure, texture, and motion to complete the missing region with realistic structure, rich visual details, and temporal coherence.
 	% explore the correlation 	
 	\item A structure attention module is designed to capture the correlation between hallucinated edges and video textures, which can provide better structural guidance for texture synthesis. % edge - texture 
-	\item Flow-guided edge and frame consistency constraints are developed to enhance the temporal coherence of the completed edges and video frames.   
+	\item Flow-guided edge and frame consistency constraints are developed to enhance the temporal coherence of both completed edges and video frames.   
 \end{itemize}
 
 
@@ -130,7 +131,7 @@ Diffusion-based methods \cite{bertalmio2000image,ballester2001filling,sridevi201
 %Fractional-order nonlinear diffusion driven by difference curvature is proposed to produce clearer image details \cite{sridevi2019image}. 
 However, this kind of method fails to handle large holes due to its assumption of local smoothness. 
 %
-Patch-based image inpainting methods, also called exemplar-based methods~\cite{bertalmio2003simultaneous,efros2001image.li2008patch,zhang2014image}, are more widely studied.
+Patch-based image inpainting methods, also called exemplar-based methods~\cite{bertalmio2003simultaneous,efros2001image,li2008patch,zhang2014image}, are more widely studied.
 They formulate the completion task as a patch-based optimization problem. 
 Barnes \emph{et al.}~\cite{barnes2009patchmatch} employ approximate nearest neighbor algorithm to fill the damaged regions.
 Sangeetha \emph{et al.}~\cite{sangeetha2011combined} propose to propagate both linear structure and two-dimensional texture into the target region.
@@ -197,6 +198,12 @@ The first deep-learning-based video inpainting method is CombCN \cite{wang2019vi
 %%\cite{Xu_2019_CVPR} proposes a stacked convolution network to predict missing motion field and regards video inpainting as a pixel propagation problem. 
 %
 To enforce temporal coherence, features from neighboring frames are collected and refined to synthesize the missing content with recurrent feedback \cite{Kim_2019_CVPR1,Kim_2019_CVPR}. 
+{\color{blue}OPN \cite{oh2019onion} uses the non-local formulation to calculate the similarity between pixels in reference and target frames, and then copy the contents of target frame based on the similarity.
+%The similarity is between video contents.
+Similarly, Copy-and-Paste \cite{lee2019copy} copies matching contexts in aligned reference frames and paste to hole pixels.
+However, both OPN and Copy-and-Paste only consider the texture correlation between frames, while ignoring the effect of edge structures.
+Thus, in this paper, we explore the correlation between spatial structure and video contents to achieve edge-preserved inpainting.}  
+
 Instead of filling pixel colors directly using CNNs, a deep flow-guided inpainting network is proposed to estimate optical flow first in the missing region and then propagate pixel colors based on the completed flow ~\cite{Xu_2019_CVPR}.
 %However, these existing methods neglect the importance of intact structure in video inpainting and typically suffer from blurs and structural cracks in the synthesized frames.  
 However, these existing methods usually suffer from blurs and structural cracks in the synthesized frames since it is non-trivial to maintain fine details and sharp edges at the same time with predicting temporally coherent pixel colors. 
