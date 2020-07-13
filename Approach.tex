@@ -179,83 +179,45 @@ The results in Fig.~\ref{fig:coarse-fine} (c) and (d) show that the coarse netwo
 
 \subsection{Flow-Guided Temporal Coherence Enhancement}
 \label{sec:fec}
-Besides the structural guidance, motion information is also considered to enhance temporal consistency among the recovered frames.
-%It is vital to maintain temporal consistency in video inpainting.
-%Optical flows are widely used to represent the dense correspondence between frames.
-%To enhance temporal consistency in the synthesized results
-To this end, we employ optical flow in the training stage of both ENet and TexNet.
-%smooth the inpainted edge maps and synthesized frames in ENet and TexNet.
-% and reinforce the temporal coherence between neighboring edge maps and frames during training. 
-%Moreover, we design an ensemble module that leverages the previous inpainted frames to refine the current frame completion, as Fig.~\ref{fig:stiNet} shows. 
-%
+Besides the structural guidance, motion information is also considered in our method to enhance temporal consistency among the recovered frames.
+We employ optical flows in the training stage of both ENet and TexNet \mdf{using self-supervision of neighboring frames.}
 A set of flow maps \(\boldsymbol{O}\) between the current frame $V_t^{gt}$ and its neighboring frames are generated using a pre-trained flow extraction network, such as FlowNet2.0~\cite{Flownet_2017_CVPR}.
 Specifically, \(\boldsymbol{O}\) consists of four flow maps \((O_{t\Rightarrow t-7}, O_{t\Rightarrow t-3}, O_{t\Rightarrow t+3}, O_{t\Rightarrow t+7})\).
-%\(\boldsymbol{O}\) contains the ground truth motion information between frames, which is important to both edge and texture generation.
-
-%From the predicted optical flow $\boldsymbol{O}^i$, FNet estimates the flow in the missing regions to obtain four flow maps \(\boldsymbol{O}\) as:
-%\begin{equation}
-%	\label{eq:flownet}
-%	\boldsymbol{O}=G^F(\boldsymbol{O}^{i},\boldsymbol{M}),
-%\end{equation}
-%where $G^F$ denotes FNet, which consists of an encoder that uses ResNet101 \cite{He_2016_CVPR} as backbone and a decoder.
-%The detailed architecture of FNet is shown in Fig.~\ref{fig:stiNet}.
-
-
-In terms of the ENet which completes the missing edges, \(\boldsymbol{O}\) is used to first warp the neighboring edge maps to the current frame, and then compute the consistency between neighboring edge maps. 
-%
-%Instead of separately training two subnetworks ENet and FNet, we train them jointly, because the temporal correlation and structural details can boost each other. 
-Thus, a flow-guided edge consistency loss is defined as:
+ 
+ 
+In terms of the ENet which completes the missing edges, \(\boldsymbol{O}\) is used to first warp the neighboring edge maps to the current frame, and then compute the consistency between neighboring edge maps.  
+A flow-guided edge consistency loss is defined as:
 %
 \begin{equation}
 	\label{eq:flow_edge}
-	\mathcal{L}^E_{fec}=\sum_{k}\frac{1}{\left\|M_{t} \right\|_1}\left\|\big(\widetilde{E}_{t}-\phi(O_{t\Rightarrow t+k},E_{t+k}^{gt})\big)\odot M_{t}\right\|_1,
+	\mathcal{L}^E_{flow}=\sum_{k}\frac{1}{\left\|M_{t} \right\|_1}\left\|\Big(\widetilde{E}_{t}-\phi\big(O_{t\Rightarrow t+k},E_{t+k}^{gt}\big)\Big)\odot M_{t}\right\|_1,
 \end{equation}
-where $\phi(O_{t\Rightarrow t+k},E_{t+k}^{gt})$ is the warping operation which warps the edge map $E_{t+k}^{gt}$ to the target frame according to the generated optical flow $O_{t\Rightarrow t+k}$.
+where $\phi\big(O_{t\Rightarrow t+k},E_{t+k}^{gt}\big)$ is the warping operation which warps a neighboring edge map $E_{t+k}^{gt}$ to the target frame according to the estimated optical flow $O_{t\Rightarrow t+k}$.
 $k$ denotes the index of neighboring frames ($k\in \left\{-7,-3,+3,+7 \right\}$). 
-%{\color{blue}If we do not consider introducing explicit flow guidance, the ENet is trained with Eq.~\eqref{eq:loss_e_}.}
-After introducing the flow-guided edge consistency loss $\mathcal{L}^E_{fec}$ into Eq.~\eqref{eq:loss_e_}, the loss function for ENet becomes:
+\mdf{By introducing this additional flow-guided edge consistency loss $\mathcal{L}^E_{flow}$ when training ENet, the original loss function (Eq.~\eqref{eq:loss_e_}) becomes:}
 \begin{equation}
 \label{eq:loss_e}
-\min\limits_{G^E} \max \limits_{D^E} \big(\mathcal{L}^E_{adv}+\lambda_1 * \mathcal{L}^E_{fm}+\mathcal{L}^E_{fec}\big).
+\min\limits_{G^E} \max \limits_{D^E} \big(\mathcal{L}^E_{adv}+\lambda_1 * \mathcal{L}^E_{fm}+\mathcal{L}^E_{flow}\big).
 \end{equation}
 
-\dlt{The total loss function for the FNet is given by:
-\begin{equation}
-	\label{eq:flow_all}
-	\mathcal{L}_{flow}=   \mathcal{L}^F_{rec}+ \mathcal{L}^F_{har}+\mathcal{L}_{fec},
-\end{equation}
-where $\mathcal{L}^F_{rec}$ and $\mathcal{L}^F_{har}$ are respectively $l_1$ loss and hard example mining loss in the missing regions, following the definition in \cite{Xu_2019_CVPR}.} 
-%Specifically, $\mathcal{L}^F_{har}$ encourages the network to focus on those hard samples in order to avoid blurry texture.
+ 
 
-%Specifically, $\mathcal{L}_{fec}$ warps the edge maps from neighboring frames to the target frame to penalize the reconstruction loss.
-%In terms of ENet, $\mathcal{L}_{fec}$ encourages the predicted edge maps to be temporally smoothing, which should conform to the motion tendency in the flow maps $\boldsymbol{O}$. 
-%In terms of FNet, $\mathcal{L}_{fec}$ constrains the model to focus on edges.
-%Thus, the total loss function for joint training of ENet and FNet is:
-%\begin{equation}
-%    \label{eq:flow}
-%    \mathcal{L}_{joint}=\mathcal{L}_{edge}+\mathcal{L}_{flow}+ \mathcal{L}_{fec}.
-%\end{equation}
-
-
-About the TexNet, we further enforce the temporal coherence of synthesized neighboring textures via a flow warping constraint $\mathcal{L}^T_{flo}$ by: 
+\mdf{Similarly, when we train the TexNet, we further enforce the temporal coherence of synthesized neighboring frames via a flow-guided texture consistency $\mathcal{L}^T_{ftc}$ by:} 
 \begin{equation}
 	\label{eq:inp_flow}
-		\mathcal{L}^T_{flo}=\sum_{k}\frac{1}{\left\|M_{t} \right\|_1}\left\|\big(\widetilde{V}_{t}-\phi(O_{t\Rightarrow t+k},V_{t+k}^{gt})\big)\odot M_{t}\right\|_1,
+		\mathcal{L}^T_{flow}=\sum_{k}\frac{1}{\left\|M_{t} \right\|_1}\left\|\Big(\widetilde{V}_{t}-\phi\big(O_{t\Rightarrow t+k},V_{t+k}^{gt}\big)\Big)\odot M_{t}\right\|_1,
 	\end{equation}
-where  $k$ is also in $\{-7,-3, 3, 7\}$. $\phi(O_{t\Rightarrow t+k},V_{t+k}^{gt})$ warps $V_{t+k}^{gt}$ to the target frame using flow $O_{t\Rightarrow t+k}$. 
-{\color{blue}Similar to ENet, the flow warping loss $\mathcal{L}^T_{flo}$ is added to the objective function of TexNet, which converts Eq.~\eqref{eq:1}
+where $k \in \{-7,-3, 3, 7\}$, and $\phi\big(O_{t\Rightarrow t+k},V_{t+k}^{gt}\big)$ warps the neighboring frame $V_{t+k}^{gt}$ to the target frame using the estimated flow $O_{t\Rightarrow t+k}$. 
+\mdf{The flow warping loss $\mathcal{L}^T_{flow}$ is added to the objective function of TexNet, which converts Eq.~\eqref{eq:1}
 to:}
 \begin{equation}
 \label{eq:1_}
-\min\limits_{G^T} \max \limits_{D^T} \big(\mathcal{L}^{T}_{rec}+\mathcal{L}^T_{adv} +\mathcal{L}^T_{flo}\big).
+\min\limits_{G^T} \max \limits_{D^T} \big(\mathcal{L}^{T}_{rec}+\mathcal{L}^T_{adv} +\mathcal{L}^T_{flow}\big).
 \end{equation}
 
-After adding the motion information to both the training process of ENet and TexNet, the temporal consistency can be enhanced in both edge generation and texture inpainting.
+After adding the motion guidance to both the training processes of ENet and TexNet, the temporal consistency can be enhanced in both edge generation and texture inpainting.
 Since the motion is only used in the training stage, the inference of the proposed structure-guided inpainting method is efficient and effective.
-
-%Finally, a temporal ensemble module is designed to refine the current frame $Y_t$ by aggregating previous frames. %The architecture is shown in Fig.~\ref{fig:stiNet}. 
-%This module is trained with a $l_1$-reconstruction loss and an adversarial loss.
-
+ 
 
 
 
