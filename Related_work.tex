@@ -108,7 +108,7 @@ In summary, our technical contributions are three-fold:
 
 \begin{figure}[t]
 	\centering
-	\includegraphics[width=1.01\columnwidth]{zong} % Reduce the figure size so that it is slightly narrower than the column. Don't use precise values for figure width.This setup will avoid overfull boxes. 
+	\includegraphics[width=1.01\columnwidth]{pipeline} % Reduce the figure size so that it is slightly narrower than the column. Don't use precise values for figure width.This setup will avoid overfull boxes. 
 	\caption{Overview of our structure-guided video inpainting network. We first complete the missing edges by aggregating information from neighboring frames to represent the target structure using the ENet. Then, the TexNet synthesizes missing textures under the guidance of structure edges. Besides, the ground truth optical flow between frames is utilized during the training stage for both ENet and TexNet to enforce temporal coherence of completed contents, as illustrated by dotted lines.}
 	\label{fig:overview}
 \end{figure}
