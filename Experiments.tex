@@ -144,7 +144,7 @@ Second, in terms of Tem-ERR about temporal smoothness, our method outperforms mo
 Specifically, as shown in Table~\ref{tab:sem}, our method is comparable with DFVI~\cite{Xu_2019_CVPR} and slightly worse than DVI~\cite{Kim_2019_CVPR1}.
 %
 The performance superiority of DVI mainly comes from the recurrent feedback loop and a memory layer (LSTM) for temporal consistency of inpainted frames. 
-DFVI iteratively propagates pixel colors according to optical flows. Both DFVI and DVI focus on designing temporal modules to obtain smooth inpainting results at the inference stage. In comparison, we enforce temporal coherence of our ENet and TexNet by introducing motion constraints only in training.}
+DFVI iteratively propagates pixel colors according to optical flows. Both DFVI and DVI focuses on designing temporal modules to obtain smooth inpainting results at the inference stage. In comparison, we enforce temporal coherence of our ENet and TexNet by introducing motion constraints only in training.}
 %More importantly, under the edge guidance, our method generates results with fine structural details, thus achieves obviously higher inpainting quality (PSNR, SSIM, FID) than DFVI~\cite{Xu_2019_CVPR} and DVI~\cite{Kim_2019_CVPR1}.
 Therefore, our method is much efficient, e.g., four times faster than DVI \cite{Kim_2019_CVPR1} and nine times faster than DFVI \cite{Xu_2019_CVPR}. 
 The inference speed of the image inpainting method Edge-Connect~\cite{nazeri2019edgeconnect} is faster than our method since it does not consider axillary temporal information between frames. 
@@ -185,8 +185,8 @@ The well-designed network architecture fully exploits structural guidance in vid
 
 \begin{figure}[!t]
 	\centering
-	\includegraphics[width=0.85\columnwidth]{vis_forg} % Reduce the figure size so that it is slightly narrower than the column. Don't use precise values for figure width. This setup will avoid overfull boxes. 
-	\caption{Results of object foreground removal. The red masks in input frames indicate the objects to be removed. Our method produces results with plausible structures and details.}
+	\includegraphics[width=\columnwidth]{vis_forg} % Reduce the figure size so that it is slightly narrower than the column. Don't use precise values for figure width. This setup will avoid overfull boxes. 
+	\caption{\mdf{Results of object foreground removal. The red masks in input frames indicate the objects to be removed. Our method produces results with plausible structures and details.}}
 	\label{vis_forg}
 \end{figure}
 
@@ -588,13 +588,13 @@ Therefore, we set $\lambda_2$ as $0.2$ in all the other experiments.
 {\color{blue}
 	\subsubsection{Different Frame Gaps}
 %
-We conducted experiments to evaluate the effects of different frame gaps. In our default setting, we use $T$ frames $\boldsymbol{V}=\msset{V}$ as input to extract informative neighboring frames. In this experiment, we try our inpainting network with smaller gaps, $\boldsymbol{V}=\{V_{t-4},V_{t-2},V_{t},V_{t+2},V_{t+4}\}$, and larger gaps,
+We conducted experiments to evaluate the effects of different frame gaps. In our default setting, we use $T$ frames $\boldsymbol{V}=\msset{V}$ as input to extract information neighboring frames. In this experiment, we try our inpainting network with smaller gaps, $\boldsymbol{V}=\{V_{t-4},V_{t-2},V_{t},V_{t+2},V_{t+4}\}$, and larger gaps,
 $\boldsymbol{V}=\{V_{t-15},V_{t-8},V_{t},V_{t+8},V_{t+15}\}$. As reported in Table \ref{tab:input-gap}, the smaller gap makes inpainting results temporally smoother (higher Tem-ERR) while the larger gap harms both spatial and temporal coherence, because it may introduce noises from distant frames. We finally choose a trade-off setting with gap of $\msset{V}$ that is able to aggregate sufficient information from neighboring frames and produce temporally smooth results.}
 
 \subsubsection{Generalization to Different Hole Size}
 {\color{blue}	To investigate the robustness of our method on different hole sizes, we test three hole sizes with fixed square mask setting, including large square in $120\times120$, medium square in $60\times60$, and small square in $30\times30$. The results using different methods are listed in Table \ref{tab:holesize_com}. 
 The performances of all the methods drop greatly on large holes. Our method achieves the best performance under most circumstances.
-The PSNR under large holes of our method is slightly worse than that of OPN~\cite{oh2019onion}, which designs an asymmetric attention block to support unlimited spatial-temporal window. However, our method is much better than OPN under other settings. The results show that the performance of our method is stable on different hole sizes.
+The PSNR under large holes of our method is slightly worse than that of OPN~\cite{oh2019onion}, which designs an asymmetric attention blocks to support unlimited spatial-temporal window. However, our method is much better than OPN under other settings. The results show that the performance of our method is stable on different hole sizes.
 
 \subsubsection{Generalization to Higher Resolution Inpainting}
 We also conducted experiments on video inpainting for higher resolutions. Based on the fully convolutional network architecture, we use the model that are trained on low resolution ($256\times256$) to complete videos in higher resolution ($1024\times512$). Results using different methods are reported in Table \ref{tab:higherres_com}. Notably, OPN~\cite{oh2019onion} is not compared here because its significantly high memory cost that cannot be deployed on our GPU cluster. 
