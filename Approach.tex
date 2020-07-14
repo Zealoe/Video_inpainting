@@ -18,6 +18,13 @@ The third part leverages the ground truth motion flow as auxiliary constraints t
 %During the inference stage, only the edge-guided inpainting path is used to complete the target frame, which generates high-quality inpainted results with low time cost.
 
 
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=0.8\columnwidth]{coars-fine} 
+	\caption{To inpaint missing regions in a corrupted frame (a), our ENet first completes corresponding sparse edges (b), which well represent the structure of the missing contents. Then TexNet progressively replenishes textures under the guidance of synthesized edges from coarse (c) to fine (d).}
+	
+	\label{fig:coarse-fine}
+\end{figure}
 
 \subsection{Edge Inpainting Network}
 \label{sec:edgenet}
@@ -25,11 +32,11 @@ The third part leverages the ground truth motion flow as auxiliary constraints t
 The edge inpainting network (ENet) completes image edges in the missing regions to depict scene structures and object shapes.
 \mdf{From $T$ neighboring corrupted frames $\boldsymbol{V}$ as well as the corresponding set of binary masks $\boldsymbol{M}$}, a Canny edge detector is first applied to extract the corresponding edge maps $\boldsymbol{E}$ in the uncorrupted regions. %Notably, the edges in the masked regions in $\boldsymbol{E}^{i}$ are missed. 
 %Given the incompleted grayscale images $\boldsymbol{X}^{g}$ of input frame, a canny edge detector is first used to generate initial edge maps. 
-The input of ENet is \mdf{the concatenation of} the incomplete grayscale version of $T$ frames $\boldsymbol{V}^{g}$, initial edge maps $\boldsymbol{E}$, and their corresponding masks $\boldsymbol{M}$.
+The input of ENet is \mdf{the concatenation of} the grayscale version of $T$ corrupted frames $\boldsymbol{V}^{g}$, initial edge maps $\boldsymbol{E}$, and their corresponding masks $\boldsymbol{M}$.
 %
-As shown in Fig.~\ref{fig:stiNet}, our ENet, denoted by $G^E$, is composed of a three-layer 3D encoder, eight 2D residual blocks, and a three-layer 3D decoder. 
+As shown in Fig.~\ref{fig:stiNet}, our ENet, denoted by $G^E$, is composed of a 3D encoder, several 2D residual blocks, and a 3D decoder. 
 %{\color{blue}Detailed network architecture implementation is listed in Table~\ref{tab:enet-arch1}.}
-The 3D encoder and decoder are designed to \mdf{capture temporal coherence, which takes large computation consumption. The intermediate 2D residual blocks are efficient in aggregating spatial contexts in large spatial receptive fields. Under a limited number of network parameters, we can adopt more 2D convolution layers, thereby obtaining larger spatial receptive fields compared to 3D convolutions.
+The 3D encoder and decoder are designed to \mdf{capture temporal coherence, which takes large computation consumption. The intermediate 2D residual blocks are efficient in aggregating spatial contexts via a large spatial receptive field. Notably, under a limited number of network parameters, the intermediate part of ENet can accommodate more 2D convolutions than 3D convolutions, thereby obtaining larger spatial receptive fields.
 This hybrid 2D and 3D convolution network achieves a good balance between spatial and temporal coherence.}
 The inpainted $T$ edge maps 	$\boldsymbol{\widetilde{E}}=\msset{\widetilde{E}}$ are obtained by:
 \begin{equation}
@@ -72,15 +79,6 @@ An example of the generated edge map is given in Fig.~\ref{fig:coarse-fine} (a) 
 The stripe pattern on the dog is well inferred from neighboring frames. 
 
 
-\begin{figure}[t]
-	\centering
-	\includegraphics[width=0.8\columnwidth]{coars-fine} 
-	\caption{To inpaint missing regions in a corrupted frame (a), our ENet first completes corresponding sparse edges (b), which well represent the structure of the missing contents. Then TexNet progressively replenishes textures under the guidance of synthesized edges from coarse (c) to fine (d).}
-	
-	\label{fig:coarse-fine}
-\end{figure}
-
-
 
 
 \begin{figure}[t]
@@ -105,15 +103,14 @@ To synthesize realistic frame textures, our TexNet adopts a coarse-to-fine archi
 Specifically, TexNet {\color{blue}$G^T$} consists of a coarse inpainting network {\color{blue}$G_c^T$} and a refinement network {\color{blue}$G_r^T$}.
 %
 %The input of TexNet is the concatenation of  $\boldsymbol{\widetilde{E}}$, $\boldsymbol{V}$, and $\boldsymbol{M}$.
-First, the coarse inpainting network consists of a set of 3D convolutions to capture the spatio-temporal contexts from the hallucinated edge maps and the corrupted input frames, and produces a rough completion $\boldsymbol{\widetilde{V}}^i$ for the $T$ frames with colors and textures. {\color{blue}The input of $G^T_c$ is the concatenation of $T$ frames $\boldsymbol{V}$, the synthesized edge maps $\boldsymbol{\widetilde{E}}$, and the masks $\boldsymbol{M}$ to produce $T$ rough inpainting frames:}
-{\color{blue}
+First, the coarse inpainting network consists of a set of 3D convolutions to capture the spatio-temporal contexts from the hallucinated edge maps and the corrupted input frames to produce a rough completion $\boldsymbol{\widetilde{V}}^i$ for the $T$ frames with colors and textures. {\color{blue}The input of $G^T_c$ is the concatenation of $T$ frames $\boldsymbol{V}$, the synthesized edge maps $\boldsymbol{\widetilde{E}}$, and the masks $\boldsymbol{M}$:}
 	\begin{equation}
 	\begin{aligned}
 	\label{eq:coarsenet}
-	\boldsymbol{\widetilde{V}}^i=G_{c}^T(\boldsymbol{V},\boldsymbol{\widetilde{E}},\boldsymbol{M}).
+	\boldsymbol{\widetilde{V}}^i=G_{c}^T(\boldsymbol{V},\boldsymbol{\widetilde{E}},\boldsymbol{M}),
 	\end{aligned}
 	\end{equation}
-}
+where $\boldsymbol{\widetilde{V}}^i$ is the output rough inpainting frames.
 %The 3D coarse network incorporates neighboring frames by convolutions of the time dimension.
 Then, the refinement network takes {\color{blue}the concatenation of} the rough inpainting results $\boldsymbol{\widetilde{V}}^i$, the synthesized edge maps $\boldsymbol{\widetilde{E}}$, and the masks $\boldsymbol{M}$ as inputs to further refine texture details in $\boldsymbol{\widetilde{V}}^i$ with the structural guidance of edges $\boldsymbol{\widetilde{E}}$. 
 Notably, only 2D convolutional layers are used in the refinement network to improve inference efficiency. 

@@ -9,13 +9,11 @@ Though great progress has been made in 2D image inpainting using deep learning t
 
 
 
-Traditional video inpainting methods employ a patch composition framework that composites content in the missing regions via patches by exploiting complementary information across neighboring frames~\cite{patwardhan2007video,wexler2004space,newson2014video}.
-% 
+Traditional video inpainting methods employ a patch composition framework that composites content in the missing regions via patches by exploiting complementary information across neighboring frames~\cite{patwardhan2007video,wexler2004space,newson2014video}. 
 These methods rely heavily on the hypothesis that the missing content in the corrupted region appears in neighboring frames, which greatly limits their generalization ability.
-%
 Recently, deep-learning-based methods have achieved great performance improvement in video inpainting \cite{wang2019video,Kim_2019_CVPR1,Xu_2019_CVPR,Kim_2019_CVPR,lee2019copy,oh2019onion}.
 A straightforward solution is to utilize 3D convolution layers to extract spatio-temporal features and predict missing contents with smooth motion \cite{wang2019video}.
-To obtain temporally smooth results, contextual information from previous frames is aggregated to synthesize corrupted regions using a recurrent feedback scheme~\cite{Kim_2019_CVPR1,Kim_2019_CVPR}, pixel propagation guided by completed flows~\cite{Xu_2019_CVPR}, 
+To obtain temporally smooth results, contextual information from previous frames is aggregated to synthesize corrupted regions of target frame using a recurrent feedback scheme~\cite{Kim_2019_CVPR1,Kim_2019_CVPR}, pixel propagation guided by completed flows~\cite{Xu_2019_CVPR}, 
 or copying similar contents from neighbouring frames \cite{lee2019copy,oh2019onion}.
 By integrating motion guidance, these methods pay more attention to temporal smoothness; however, structure rationality and object details have not been well explored. 
 
@@ -35,8 +33,7 @@ Compared with previous video inpainting methods that only consider motion guidan
 First, we design an edge inpainting network (ENet) to predict sparse edges in the missing region to represent the target structure for each frame by exploiting the spatio-temporal neighboring information from adjacent frames.
 %Second, texture
 Then, under the guidance of completed edges, we employ a texture inpainting network (TexNet) to fill the missing region via a coarse-to-fine architecture and a structure attention module (SAM).
-Specifically, the SAM is designed to guide the texture generation by capturing the latent spatial relevance between video textures and the synthesized edges.
-Notably, such a structure-texture relevance can effectively improve the inpainting quality in TexNet with fewer cracks and more realistic object contours.
+Specifically, the SAM is designed to guide the texture generation of TexNet by capturing the latent spatial relevance between video textures and the synthesized edges to achieve fewer cracks and more realistic object contours.
 Furthermore, to enhance the temporal coherence of synthesized frames, we employ motion flows for consistency check of both edge maps and inpainted frames during the training stage.
 %
 The ground truth optical flow is exploited to guide both ENet and TexNet to generate temporally smooth edge maps and texture results via edge consistency and frame warping losses.
@@ -84,7 +81,7 @@ Diffusion-based methods \cite{bertalmio2000image,ballester2001filling,sridevi201
 %Li \emph{et al.}~\cite{li2016image} define diffusion coefficients according to the relation between the damaged pixels and neighborhood pixels.
 %Li \emph{et al.}~\cite{li2017localization} attempt to solve the problem of localization of diffusion-based inpainted regions.
 %Fractional-order nonlinear diffusion driven by difference curvature is proposed to produce clearer image details \cite{sridevi2019image}. 
-However, this category of methods fail to handle large holes due to its assumption of local smoothness. 
+However, this category of methods fails to handle large holes due to its assumption of local smoothness. 
 %
 Patch-based image inpainting methods, also called exemplar-based methods~\cite{bertalmio2003simultaneous,efros2001image,li2008patch,zhang2014image}, are more widely studied.
 They formulate the completion task as a patch-based optimization problem. 
@@ -105,11 +102,12 @@ Newson \emph{et al.} \cite{newson2014video} extend the 2D PatchMatch algorithm~\
 Xu \emph{et al.} \cite{xu2015video} first complete motion field to guide the patch composition for video background completion.
 Huang \emph{et al.} \cite{huang2016temporally} jointly estimate optical flow and textures to promote temporal coherence.
 %
-Another group of methods separate foreground and background apart, and then deal with the two parts respectively with different algorithms, since there naturally exists property difference between them.  
+Another group of methods separate foreground and background apart, and then deal with the two parts with different algorithms, respectively.
+%, naturally exists property difference between the.  
 Ghanbari \emph{et al.} \cite{ghanbari2011contour} first separate foreground and background in videos, and fills the two parts accordingly with the help of contours.
 Xia \emph{et al.} \cite{xia2011exemplar} make use of Gaussian mixture models to distinguish moving foreground and still background, and process them separately.   
 %However, traditional metshods assume that there exist similar contents in known regions, thus fail to synthesize unseen appearances. 
-However, in these patch-based video inpainting methods, the patch-searching process suffers from high computational complexity, thus limits their usage in practical applications.
+However, in these patch-based video inpainting methods, the patch-searching process suffers from high computational complexity, thus limiting their usage in practical applications.
 
 
 
@@ -152,7 +150,7 @@ Similarly, Copy-and-Paste \cite{lee2019copy} copies matching contexts in aligned
 However, both OPN and Copy-and-Paste only consider the texture correlation between neighboring frames, while ignoring high-level structures.
 In comparison, we explore the correlation between structures and textures to achieve high-quality inpainting results.}  
 %
-Instead of filling pixel colors directly using CNNs, flow a deep flow-guided inpainting network is proposed to estimate optical flow first in the missing region and then propagate pixel colors based on the completed flow \cite{Xu_2019_CVPR}.
+Instead of filling pixel colors directly using CNNs, a deep flow-guided inpainting network is proposed in \cite{Xu_2019_CVPR} to estimate optical flow first in the missing region and then propagate pixel colors based on the completed flow.
 However, these existing methods usually suffer from blurs and structural cracks in the synthesized frames since it is non-trivial to maintain fine details and sharp edges simultaneously when predicting temporally coherent pixel colors. 
 In comparison, we propose to explicitly complete the target structure using edges, which are efficient due to their sparsity. To utilize structural information more effectively, we also introduce a structure attention mechanism. 
 Under the structural guidance, more visually pleasing results could be synthesized with plausible structure and fine details. 
