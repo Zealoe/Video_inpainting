@@ -473,7 +473,7 @@ This makes them suffer from over-smoothing and blurry contours, which significan
 To address this issue, we present a novel structure-guided video inpainting approach that enhances temporal structure coherence to improve video inpainting results. 
 In contrast to directly synthesizing the missing pixel colors, we first complete edges in the missing regions to depict scene structures and object shapes via an edge inpainting network with 3D convolutions. 
 Then, we replenish textures using a coarse-to-fine synthesis network with a structure attention module (SAM), under the guidance of the synthesized edges.
-Specifically, our SAM is designed to model the semantic correlation between video textures and structural edges to generate more realistic contents.
+Specifically, our SAM is designed to model the semantic correlation between video textures and structural edges to generate more realistic content.
 Besides, motion flows between neighboring frames are employed to enhance temporal consistency for self-supervision during training the edge inpainting and texture inpainting modules.
 Consequently, the inpainting results using our approach are visually pleasing with fine details and temporal coherence. 
 Experiments on the YouTubeVOS and DAVIS datasets show that our method obtains state-of-the-art performance under diverse video inpainting settings.
@@ -507,7 +507,7 @@ Video inpainting, Structure guidance, Flow Assistance.
 
 
 \section{Conclusion}\label{sec:conclu}
-In this paper, we propose a novel structure-guided video inpainting approach which effectively utilizes structural information to recover fine-detailed content in corrupted videos.
+In this paper, we propose a novel structure-guided video inpainting approach, which effectively utilizes structural information to recover fine-detailed content in corrupted videos.
 We first infer the target structure by predicting sparse edges in the missing region using an edge inpainting network. 
 Then under the guidance of hallucinated edges, the missing content can be synthesized using the proposed coarse-to-fine texture network.
 %

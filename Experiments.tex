@@ -4,7 +4,6 @@ To evaluate the effectiveness of our approach, we conduct a series of comparison
 %We test on two datasets, YouTubeVOS \cite{xu2018youtube} and DAVIS \cite{davis_2017}, to compare the proposed STSENet with state-of-the-art methods. %Several ablation studies are conducted to prove the effectiveness of spatial details and temporal information in video inpainting.
 
 
-
 \begin{table*}[t]
 	\caption{Comparisons with \mdf{six state-of-the-art methods on YouTubeVOS. Our method outperforms all other methods on three video quality metrics, with comparable temporal smoothness and higher inference speed.}}\smallskip
 	
@@ -71,13 +70,77 @@ To evaluate the effectiveness of our approach, we conduct a series of comparison
 \end{table*}
 
 
+\begin{table}[t]
+	\caption{ENet architecture details. }\smallskip
+	\scriptsize
+	\centering
+	{
+		\smallskip\begin{tabular}{c|c|c|c|c}
+			\hline\hline
+			\textbf{Network} & \textbf{Arch} & \textbf{Operation} & \textbf{Kernel size} & \textbf{Output channels}  \\ \hline \hline
+			&\multirow{2}{*}{ Encoder} &	Conv3D  & (3,7,7) & [64]  \\ \cline{3-5}
+			
+			& & 	Conv3D &  (3,4,4) & [128,256]  \\ 
+			\cline{2-5}
+			$G^E$	& ResnetBlock & DilatedConv2D &  (3,3) &[256]*8 \\ 
+			\cline{2-5}
+			& \multirow{2}{*}{Decoder} & 	ConvTranspose3D &  (3,4,4) & [128,64]  \\ \cline{3-5}
+			& & 	ConvTranspose3D &  (3,7,7) & [1]  \\ \hline \hline
+			
+			$D^E$& & Conv2D & (4,4) & [64,128,256,512,1] \\ \hline
+			
+		\end{tabular}
+	}
+	\label{tab:enet-arch1}
+\end{table}
+
+
+\begin{table}[t]
+	\caption{TexNet architecture details. We use Gated convolution for the whole network, which is omitted for space saving. DeConvBlock denotes Deconv+Conv. }\smallskip
+	\scriptsize
+	\centering
+	{
+		\smallskip\begin{tabular}{c|c|c|c|c}
+			\hline\hline
+			\textbf{Network} &\textbf{Arch} & \textbf{Operation} & \textbf{Kernel size} & \textbf{Output channels} \\ \hline \hline
+			\multirow{13}{*}{$G^T$}	& & Conv3D  & (3,5,5) & [16]  \\ \cline{3-5}
+			& & Conv3D  & (3,3,3) & [32,64,128] 
+			\\ \cline{3-5}
+			& Coarse 	 & DilatedConv3D  & (3,3,3) & [256,256,256]
+			\\ \cline{3-5}
+			&	& Conv3D  & (3,3,3) & [128]  \\ \cline{3-5}
+			&	& DeConvBlock3D  & (3,3,3) & [32,3]  \\ \cline{2-5}
+			& \multirow{8}{*}{Refine} & Conv2D & (5,5) & [64]\\ \cline{3-5}
+			&& Conv2D & (3,3) & [128,128,256,256] \\ \cline{3-5}
+			&	& DilatedConv2D & (3,3) & [256,256,256,256] \\ \cline{3-5}
+			
+			&& Conv2D & (3,3) & [256] \\ \cline{3-5}
+			
+			
+			&& SAM & - & [256] \\ \cline{3-5}
+			
+			&& Conv2D & (3,3) & [256] \\ \cline{3-5}
+			
+			&& DeConvBlock2D & (3,3) & [128,32] \\ \cline{3-5}	
+			
+			&& Conv2D & (3,3) & [3] \\ \hline \hline
+			
+			$D^T$ & & Conv2D & (4,4) & [64,128,256,512,1] \\ \hline
+			
+		\end{tabular}
+	}
+	\label{tab:tex-arch}
+\end{table}
+
+
+
 \subsection{Experimental Settings}
 \noindent \textbf{Mask Setting.} Considering different real-world applications, we test four kinds of mask settings in this paper, which are different in shapes and positions of the missing regions. 
 %The first and the second settings aims to recover rectangular regions, which are common in watermark removal.
 \begin{enumerate}
 \item Fixed square mask: The size and position of the missing square regions are fixed through the whole video. 
 \item Moving square mask: The position and size of the square masks change over frames. 
-\item Free-from mask: We apply irregular masks which imitate hand-drawn masks on each frame, following \cite{liu2018partialinpainting}. 
+\item Free-from mask: We apply irregular masks that imitate hand-drawn masks on each frame, following \cite{liu2018partialinpainting}. 
 \item Foreground object mask: This type of mask is defined to line out foreground objects in videos and used for testing object removal.
 \end{enumerate}
 
@@ -111,7 +174,7 @@ We first train ENet and TexNet without flow-constrained losses, and then add the
 An Adam optimizer with $\beta=(0.9, 0.999)$ is used for all sub-network training.
 As for the hyper-parameters in the training losses, we set $\lambda_1=10.0$ in Eq.~(\ref{eq:loss_e}), $\lambda_2=0.2$ in Eq.~(\ref{eq:loss_rec}), which will be analyzed later. 
 %, \lambda_3=0.1$.
-{\color{blue} The detailed network parameters of ENet and TexNet are listed in the supplementary material.
+{\color{blue} The detailed network parameters of ENet and TexNet are listed in the Table \ref{tab:enet-arch1} and Table \ref{tab:tex-arch}, respectively.
 During inference, we sequentially feed five neighboring frames with gaps into the inpainting network and output the reconstructed frame $\widetilde{V}_t$ in one forward pass.
 }
 
@@ -122,7 +185,7 @@ Four commonly-used metrics, including structural similarity index (SSIM) \cite{w
 {\color{blue}Specifically, PSNR, SSIM, and FID focus on frame generation quality, while Tem-ERR is used to assess the temporal smoothness.} 
 For each training video at mask setting (4), we randomly select a test video from the 90 test videos in the DAVIS dataset and apply its masks for the current training video with random rotation, scaling, and translation.
 Our inpainting network is first trained on the YoutubeVOS dataset and then finetuned on the DAVIS dataset. 
-Since there are no ground truth video for mask setting (4) of foreground object removal, quantitative evaluation is infeasible. Instead, a user study is conducted.  
+Since there is no ground truth video for mask setting (4) of foreground object removal, quantitative evaluation is infeasible. Instead, a user study is conducted.  
 
 
 
@@ -134,17 +197,17 @@ We train \cite{nazeri2019edgeconnect,Xu_2019_CVPR} using their published codes a
 
 
 The quantitative results and inference speeds are reported in Table~\ref{tab:sem}.
-It can be seen that our method outperforms state-of-the-art methods on most of metrics of generation quality.
+It can be seen that our method outperforms state-of-the-art methods on most of the metrics of generation quality.
 First, in terms of three metrics of PSNR, SSIM, and FID about inpainting quality, our method outperforms all other methods, demonstrating the effectiveness of introducing structure guidance into video inpainting.
 Especially, compared with the 2D image inpainting method Edge-Connect~\cite{nazeri2019edgeconnect}, which also predicts edges to represent the target structure, our method greatly increases the completion performance by leveraging neighboring frames to complete edges and synthesize textures. 
-Compared with other flow-based video inpainting methods without edge enhancement, our method shows great superiority on generating temporally coherent and realistic contents. 
+Compared with other flow-based video inpainting methods without edge enhancement, our method shows great superiority in generating temporally coherent and realistic content. 
 
 {\color{blue}
-Second, in terms of Tem-ERR about temporal smoothness, our method outperforms most of existing methods, proving that the temporal consistency constraint during training can exactly facilitate temporal coherence.
-Specifically, as shown in Table~\ref{tab:sem}, our method is comparable with DFVI~\cite{Xu_2019_CVPR} and slightly worse than DVI~\cite{Kim_2019_CVPR1}.
+Second, in terms of Tem-ERR about temporal smoothness, our method outperforms most of the existing methods, proving that the temporal consistency constraint during training can exactly facilitate temporal coherence.
+Specifically, as shown in Table~\ref{tab:sem}, our method is comparable with DFVI~\cite{Xu_2019_CVPR} and worse than DVI~\cite{Kim_2019_CVPR1}.
 %
 The performance superiority of DVI mainly comes from the recurrent feedback loop and a memory layer (LSTM) for temporal consistency of inpainted frames. 
-DFVI iteratively propagates pixel colors according to optical flows. Both DFVI and DVI focuses on designing temporal modules to obtain smooth inpainting results at the inference stage. In comparison, we enforce temporal coherence of our ENet and TexNet by introducing motion constraints only in training.}
+DFVI iteratively propagates pixel colors according to optical flows. Both DFVI and DVI focuses on designing temporal modules to obtain smooth inpainting results at the inference stage. In comparison, we enforce the temporal coherence of our ENet and TexNet by introducing motion constraints only in training.}
 %More importantly, under the edge guidance, our method generates results with fine structural details, thus achieves obviously higher inpainting quality (PSNR, SSIM, FID) than DFVI~\cite{Xu_2019_CVPR} and DVI~\cite{Kim_2019_CVPR1}.
 Therefore, our method is much efficient, e.g., four times faster than DVI \cite{Kim_2019_CVPR1} and nine times faster than DFVI \cite{Xu_2019_CVPR}. 
 The inference speed of the image inpainting method Edge-Connect~\cite{nazeri2019edgeconnect} is faster than our method since it does not consider axillary temporal information between frames. 
@@ -196,7 +259,7 @@ The well-designed network architecture fully exploits structural guidance in vid
 In regard to the foreground object mask setting that aims to remove undesired objects in videos, there is no ground truth for quantitative evaluation. 
 Therefore, we conduct a user study on the DAVIS dataset to evaluate the visual quality of completion results using our method, compared with the four methods \cite{nazeri2019edgeconnect,wang2019video,Kim_2019_CVPR1,Xu_2019_CVPR}.
 %
-In each test, we show three videos to the subject at the same time. The original video with red masks indicating objects to remove is shown in the middle, while the inpainting results of our method and one of the other four methods are shown on the two sides in a random order.
+In each test, we show three videos to the subject at the same time. The original video with red masks indicating objects to remove is shown in the middle, while the inpainting results of our method and one of the other four methods are shown on the two sides in random order.
 %  
 The subjects can watch the videos repeatedly to better evaluate the differences.
 For each video triplet, the subject is asked to choose which inpainting video is preferred.
@@ -261,7 +324,7 @@ Notably, our method is much faster than DFVI.
 %
 Fig.~\ref{vis_forg} shows two examples of object removal using different methods. 
 We can see that the inpainted results generated by our method are visually better than existing methods.
-Compared to the blurry contents in the results of Edge-Connect, CombCN, and DVI, our method produces sharp object boundaries and fine visual details. Notably, though the completed contents using DFVI have sharp edges, the global structure of the human bodies is corrupted. In comparison, our method achieves more intact and plausible structure with fine details.
+\mdf{Compared to the blurry contents in the results of Edge-Connect, CombCN, DVI, and Copy-and-Paste, our method produces sharp object boundaries and fine visual details. Notably, though the completed contents using DFVI and OPN have sharp edges, the global structure of the human bodies is corrupted. }In comparison, our method achieves more intact and plausible structure with fine details.
 The results demonstrate the importance of utilizing structure information in video inpainting. 
 
 
@@ -296,7 +359,7 @@ The quantitative results are reported as in Table~\ref{tab:abl}.
 In Table~\ref{tab:abl}, The model `+Edge' brings large improvement over the baseline model.
 It indicates that sparse edges can provide effective structural guidance in video inpainting. 
 \mdf{On the other hand, the structure inference module ENet brings extra computational cost compared to the baseline TexNet from 7.6335 \emph{fps} to 5.2356 \emph{fps}.}
-When we further add SAM, extra performance improvement is obtained, demonstrating that the spatial correlation between edges and textures can be better embedded and absorbed by the texture inpainting network than simply feeding the hallucinated edge maps as extra channels into TexNet. {\color{blue}Besides, the SAM does not bring too much computational cost, as shown by \#Params and GFLOPs in Table~\ref{tab:abl}. The is because SAM takes down-sampled edge maps and video feature maps in low resolution as input. The comparable inference speeds also demonstrate that in current setting, SAM brings performance gains with affordable cost and can be used in practice. However, when coming to high-resolution inpainting task, SAM may put a higher demand on the computational resource.}
+When we further add SAM, extra performance improvement is obtained, demonstrating that the spatial correlation between edges and textures can be better embedded and absorbed by the texture inpainting network than simply feeding the hallucinated edge maps as extra channels into TexNet. {\color{blue}Besides, the SAM does not bring too much computational cost, as shown by \#Params and GFLOPs in Table~\ref{tab:abl}. This is because SAM takes down-sampled edge maps and video feature maps in low resolution as input. The comparable inference speeds also demonstrate that in the current setting, SAM brings performance gains with affordable cost and can be used in practice. However, when coming to high-resolution inpainting task, SAM may put a higher demand on the computational resource.}
 %The above analysis proves that the structure clues are effective guidance in video inpainting and facilitate the prediction of more plausible frames with completed and detailed structure.
  
 
@@ -348,7 +411,7 @@ Thus, structure clues are effective guidance in video inpainting and facilitate 
 We propose a novel structure attention module (SAM) in TexNet to encode the structure information of edge maps into the texture inpainting. 
 {\color{blue}
 Here, to prove the effectiveness of SAM in exploiting the structure information, we conducted a comparison experiment between the proposed SAM and two other commonly used variants of attention module. SimATT is a simple two-layer attention \cite{min2019two},~\emph{i.e.}, using a two-layer convolution network to extract a spatial attention map from predicted edge maps, which is then applied to the same video feature as SAM. SelfATT is a self attention module \cite{vaswani2017attention} which takes only video features as input, without edges. 
-As shown in Table~\ref{tab:sam_com}, SimATT performs worse than the proposed SAM since it lacks edge-texture interaction during attention generation. SelfATT produces better results than adding simple attention, but worse than our SAM. By adding structural-texture mutual interaction in our SAM, we obtain better results than SimATT and SelfATT. These results prove that structure information is important in video inpainting, and our SAM is more effective in revealing potential correlation between structure information in edge maps and video contents.	
+As shown in Table~\ref{tab:sam_com}, SimATT performs worse than the proposed SAM since it lacks edge-texture interaction during attention generation. SelfATT produces better results than adding simple attention, but worse than our SAM. By adding structural-texture mutual interaction in our SAM, we obtain better results than SimATT and SelfATT. These results prove that structure information is important in video inpainting, and our SAM is more effective in revealing the potential correlation between structure information in edge maps and video contents.	
 }
 
 
@@ -434,8 +497,8 @@ In comparison, our hybrid 3D+2D convolutions architecture achieves comparable re
 
 %Temporal coherence is an important factor in video inpainting. 
 We utilize temporal information to smoothen artificial flickers via two developed flow-guided warping losses during training. 
-Table~\ref{tab:abl} shows that the quantitative performance is improved on all three mask settings by adding the flow guidance. 
-\mdf{According to the metric of Tem-ERR, the inpainting results are temporally smoother when adding edge and SAM. Furthermore, adding the flow-based constraints brings additional improvement on temporal consistency. %This demonstrates the effect of flow guidance.
+Table~\ref{tab:abl} shows that quantitative performance is improved on all three mask settings by adding the flow guidance. 
+\mdf{According to the metric of Tem-ERR, the inpainting results are temporally smoother when adding edge and SAM. Furthermore, adding the flow-based constraints brings additional improvement in temporal consistency. %This demonstrates the effect of flow guidance.
 }
 Especially, we only add flow guidance in the training phase. 
 Thus it brings performance gains without extra computation costs during testing.
@@ -479,7 +542,7 @@ The model obtains the best performance at $\lambda_1=10.0$.
 $\lambda_2$ in Eq.~\eqref{eq:loss_rec} is the weight of L1 reconstruction loss of the coarse prediction in TexNet. 
 When $\lambda_2$ is $0.0$, the TexNet is trained without the supervision of the coarse prediction, and the inpainting quality is significantly harmed.
 % the result is heavily harmed. 
-It demonstrates that the coarse-to-fine architecture is effective in TexNet. The performance drops when $\lambda_2>0.2$, which reflects that the supervision on the fine prediction networks is more important on synthesizing visual details.
+It demonstrates that the coarse-to-fine architecture is effective in TexNet. The performance drops when $\lambda_2>0.2$, which reflects that the supervision on the fine prediction networks is more important in synthesizing visual details.
 Therefore, we set $\lambda_2$ as $0.2$ in all the other experiments.
 
 
@@ -594,11 +657,11 @@ $\boldsymbol{V}=\{V_{t-15},V_{t-8},V_{t},V_{t+8},V_{t+15}\}$. As reported in Tab
 \subsubsection{Generalization to Different Hole Size}
 {\color{blue}	To investigate the robustness of our method on different hole sizes, we test three hole sizes with fixed square mask setting, including large square in $120\times120$, medium square in $60\times60$, and small square in $30\times30$. The results using different methods are listed in Table \ref{tab:holesize_com}. 
 The performances of all the methods drop greatly on large holes. Our method achieves the best performance under most circumstances.
-The PSNR under large holes of our method is slightly worse than that of OPN~\cite{oh2019onion}, which designs an asymmetric attention blocks to support unlimited spatial-temporal window. However, our method is much better than OPN under other settings. The results show that the performance of our method is stable on different hole sizes.
+The PSNR under large holes of our method is slightly worse than that of OPN~\cite{oh2019onion}, which designs an asymmetric attention block to support unlimited spatial-temporal window. However, our method is much better than OPN under other settings. The results show that the performance of our method is stable on different hole sizes.
 
 \subsubsection{Generalization to Higher Resolution Inpainting}
-We also conducted experiments on video inpainting for higher resolutions. Based on the fully convolutional network architecture, we use the model that are trained on low resolution ($256\times256$) to complete videos in higher resolution ($1024\times512$). Results using different methods are reported in Table \ref{tab:higherres_com}. Notably, OPN~\cite{oh2019onion} is not compared here because its significantly high memory cost that cannot be deployed on our GPU cluster. 
-Compared to other methods, our method achieve the best performance with great superiority for high resolution inpainting, demonstrating the effectiveness and robustness of our method.
+We also conducted experiments on video inpainting for higher resolutions. Based on the fully convolutional network architecture, we use the model that is trained on low resolution ($256\times256$) to complete videos in higher resolution ($1024\times512$). Results using different methods are reported in Table \ref{tab:higherres_com}. Notably, OPN~\cite{oh2019onion} is not compared here because of its significantly high memory cost that cannot be deployed on our GPU cluster. 
+Compared to other methods, our method achieves the best performance with great superiority for high-resolution inpainting, demonstrating the effectiveness and robustness of our method.
 }
  
 
